@@ -483,7 +483,7 @@ public class AReportsFrame extends javax.swing.JFrame {
             Set<JasperReportInfo> reportSet = reportsMap.get(key);
             for (JasperReportInfo reportInfo : reportSet) {
                 // save the report model to the file
-                ReportUtils.saveReportModelToFile(reportInfo);
+                ReportUtils.saveReportConfigFile(reportInfo);
 
                 // now copy the file to the server
                 ReportUtils.copyReportFile(reportInfo);

@@ -19,11 +19,7 @@ public class AReports {
     public static void main(String[] args) {
         String currentDirectoryName = System.getProperty("user.dir");
         File reportsDirectory = new File(currentDirectoryName + "/reports");
-        File modelDirectory = new File(currentDirectoryName + "/reports/model");
         String localASpaceDirectory = System.getProperty("user.home") + "/ASpace/archivesspace";
-        
-        // set the model directory for file util
-        ReportUtils.modelDirectory = modelDirectory;
         
         /* DEBUG code testing connect to the remote directory. Remove before commiting
         // to remote

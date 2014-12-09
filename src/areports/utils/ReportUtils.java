@@ -32,7 +32,6 @@ import org.w3c.dom.NodeList;
 public class ReportUtils {
 
     //private static String aspaceReportsDir = "/"
-    public static File modelDirectory = null;
     private static String sftpHost;
     private static String aspaceDirectory;
     private static ChannelSftp sftpChannel = null;
@@ -139,11 +138,12 @@ public class ReportUtils {
      *
      * @param reportInfo
      */
-    public static void saveReportModelToFile(JasperReportInfo reportInfo) {
-        File file = new File(modelDirectory, reportInfo.getReportModelFilename());
+    public static void saveReportConfigFile(JasperReportInfo reportInfo) {
+        String filename = reportInfo.getParentDirectoryName() + File.separator + reportInfo.getConfigFilename();
+        File file = new File(filename);
 
         try {
-            FileUtils.writeStringToFile(file, reportInfo.getReportModel());
+            FileUtils.writeStringToFile(file, reportInfo.getReportConfig());
         } catch (IOException ex) {
             Logger.getLogger(ReportUtils.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -230,18 +230,9 @@ public class ReportUtils {
         String dirName = aspaceDirectory + File.separator + "reports" + File.separator + reportInfo.getReportName();
         File aspaceReportsDir = new File(dirName);
 
-        dirName = aspaceDirectory + File.separator + "plugins/local/backend/model/reports";
-        File aspaceModelDirectory = new File(dirName);
-
-        File modelFile = new File(modelDirectory + File.separator + reportInfo.getReportModelFilename());
-
         try {
             // copy the directory containing the report
             FileUtils.copyDirectory(reportDir, aspaceReportsDir);
-
-            // now copy the model file
-            FileUtils.copyFileToDirectory(modelFile, aspaceModelDirectory);
-
         } catch (IOException ex) {
             Logger.getLogger(ReportUtils.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -255,7 +246,6 @@ public class ReportUtils {
     private static void copyToRemoteHost(JasperReportInfo reportInfo) {
         // first create the remote directory to hold all the report related files 
         String remoteReportDirectory = "reports/" + reportInfo.getReportName();
-        String remoteReportModelFilename = "plugins/local/backend/model/reports/" + reportInfo.getReportModelFilename();
 
         try {
             // get the report and sub report files
@@ -273,11 +263,6 @@ public class ReportUtils {
                 sftpChannel.put(new FileInputStream(file), remoteFilename, ChannelSftp.OVERWRITE);
                 System.out.println("Copied Report File " + remoteFilename);
             }
-
-            // finally, copy the report model file
-            File modelFile = new File(modelDirectory + File.separator + reportInfo.getReportModelFilename());
-            sftpChannel.put(new FileInputStream(modelFile), remoteReportModelFilename, ChannelSftp.OVERWRITE);
-            System.out.println("Copied Report Model File " + remoteReportModelFilename);
         } catch (SftpException | FileNotFoundException ex) {
             Logger.getLogger(ReportUtils.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -297,7 +282,8 @@ public class ReportUtils {
 
         for (File file : directory.listFiles()) {
             if (file.isFile() && (file.getName().contains(".jasper")
-                    || file.getName().contains(".jrxml"))) {
+                    || file.getName().contains(".jrxml") 
+                    || file.getName().contains(".yml"))) {
                 reportFiles.add(file);
             }
         }

@@ -56,7 +56,7 @@ public class JasperReportInfo implements Comparable {
      * Get a short name
      * @return 
      */
-    public String getReportDescription() {
+    public String getShortDescription() {
         String shortDescription = StringUtils.join(
                 StringUtils.splitByCharacterTypeCamelCase(reportName), " ");
         return shortDescription;
@@ -81,19 +81,16 @@ public class JasperReportInfo implements Comparable {
     /**
      * Method to return the ASpace report model
      */
-    public String getReportModel() {
-        String model = "class " + getReportName() + " < JDBCReport \n" + 
-                "\tregister_report({ \n" + 
-                "\t\t:uri_suffix => \"" + getReportURI() + "\", \n" + 
-                "\t\t:description => \"" +  getReportDescription() + "\", \n" +
-                "\t})\n" + 
-                "end \n";
+    public String getReportConfig() {
+        String config = "report_type: jdbc\n" + 
+                "uri_suffix: " + getReportURI() + "\n" + 
+                "description: \"" +  getDescription() + "\"\n";
         
-        return model;
+        return config;
     }
     
-    public String getReportModelFilename() {
-        return getReportURI() + "_report.rb";
+    public String getConfigFilename() {
+        return "report_config.yml";
     }
     
     @Override
