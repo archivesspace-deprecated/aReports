@@ -5,7 +5,6 @@
  */
 package areports;
 
-import areports.utils.ReportUtils;
 import java.io.File;
 
 /**
@@ -20,24 +19,6 @@ public class AReports {
         String currentDirectoryName = System.getProperty("user.dir");
         File reportsDirectory = new File(currentDirectoryName + "/reports");
         String localASpaceDirectory = System.getProperty("user.home") + "/ASpace/archivesspace";
-        
-        /* DEBUG code testing connect to the remote directory. Remove before commiting
-        // to remote
-        System.out.println("Report Directory " + reportsDirectory.getAbsolutePath());
-        TreeMap<String, Set<JasperReportInfo>> reportsMap = ReportUtils.findJasperReports(reportsDirectory, null, null);
-        
-        ReportUtils.connectToSFTPHost("54.235.231.8:22", "aspace", "migrat34un", "ASpace4/archivesspace");
-        
-        for(String key: reportsMap.keySet()) {
-            Set<JasperReportInfo> reportSet = reportsMap.get(key);
-            for(JasperReportInfo reportInfo: reportSet) {
-                // save the report model to the file
-                ReportUtils.saveReportModelToFile(reportInfo);
-                
-                // now copy the file to the server
-                ReportUtils.copyReportFile(reportInfo);
-            }
-        }*/
         
         AReportsFrame frame = new AReportsFrame();
         frame.loadPreferences(reportsDirectory, localASpaceDirectory);
