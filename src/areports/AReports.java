@@ -23,7 +23,6 @@ public class AReports {
         AReportsFrame frame = new AReportsFrame();
         frame.loadPreferences(reportsDirectory, localASpaceDirectory);
         frame.loadReportsMap();
-        frame.pack();
         frame.setVisible(true);        
     }
 
