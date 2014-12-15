@@ -87,7 +87,7 @@ BEGIN
         DECLARE f_coordinate_2 VARCHAR(255);
         DECLARE f_coordinate_3 VARCHAR(255);
         
-        -- The three select statements can be combined into 1 query by for clarity 
+        -- The three select statements can be combined into 1 query, but for clarity 
         -- are left separate
 	SELECT CONCAT(location.`coordinate_1_label`, ' ', location.`coordinate_1_indicator`)  
                 INTO f_coordinate_1 
@@ -107,6 +107,322 @@ BEGIN
         SET f_coordinate = CONCAT_WS('/', f_coordinate_1, f_coordinate_2, f_coordinate_3);
         
 	RETURN f_coordinate;
+END $$
+
+DELIMITER ;
+
+
+-- Function to return the number of resources for a particular repository
+DROP FUNCTION IF EXISTS GetEnumValue;
+
+DELIMITER $$
+
+CREATE FUNCTION GetEnumValue(f_enum_id INT) 
+	RETURNS VARCHAR(255)
+BEGIN
+	DECLARE f_value VARCHAR(255);	
+	
+	SELECT enumeration_value.`value`INTO f_value
+	FROM enumeration_value
+	WHERE enumeration_value.`id` = f_enum_id;
+	    
+	RETURN f_value;
+END $$
+
+DELIMITER ;
+
+-- Function to return the number of resources for a particular repository
+DROP FUNCTION IF EXISTS GetTotalResources;
+
+DELIMITER $$
+
+CREATE FUNCTION GetTotalResources(f_repo_id INT) 
+	RETURNS INT
+BEGIN
+	DECLARE f_total INT;	
+	
+	SELECT COUNT(id) INTO f_total 
+	FROM resource 
+	WHERE resource.`repo_id` = f_repo_id;
+	    
+	RETURN f_total;
+END $$
+
+DELIMITER ;
+
+-- Function to return the number of resources with level = item for a 
+-- particular repository
+DROP FUNCTION IF EXISTS GetTotalResourcesItems;
+
+DELIMITER $$
+
+CREATE FUNCTION GetTotalResourcesItems(f_repo_id INT) 
+	RETURNS INT
+BEGIN
+	DECLARE f_total INT;	
+	
+	SELECT COUNT(id) INTO f_total 
+	FROM resource 
+	WHERE (resource.`repo_id` = f_repo_id
+	AND 
+	GetEnumValue(resource.`level_id`) = 'item' COLLATE utf8_general_ci);
+	    
+	RETURN f_total;
+END $$
+
+DELIMITER ;
+
+-- Function to return the number of resources with restrictions for a 
+-- particular repository
+DROP FUNCTION IF EXISTS GetResourcesWithRestrictions;
+
+DELIMITER $$
+
+CREATE FUNCTION GetResourcesWithRestrictions(f_repo_id INT) 
+	RETURNS INT
+BEGIN
+	DECLARE f_total INT;	
+	
+	SELECT COUNT(id) INTO f_total 
+	FROM resource 
+	WHERE (resource.`repo_id` = f_repo_id
+	AND 
+	resource.`restrictions` = 1);
+	    
+	RETURN f_total;
+END $$
+
+DELIMITER ;
+
+-- Function to return the number of resources with finding aids for a 
+-- particular repository
+DROP FUNCTION IF EXISTS GetResourcesWithFindingAids;
+
+DELIMITER $$
+
+CREATE FUNCTION GetResourcesWithFindingAids(f_repo_id INT) 
+	RETURNS INT
+BEGIN
+	DECLARE f_total INT;	
+	
+	SELECT COUNT(id) INTO f_total 
+	FROM resource 
+	WHERE (resource.`repo_id` = f_repo_id
+	AND 
+	resource.`ead_id` IS NOT NULL);
+	    
+	RETURN f_total;
+END $$
+
+DELIMITER ;
+
+-- Function to return the number of accessions for a particular repository
+DROP FUNCTION IF EXISTS GetTotalAccessions;
+
+DELIMITER $$
+
+CREATE FUNCTION GetTotalAccessions(f_repo_id INT) 
+	RETURNS INT
+BEGIN
+	DECLARE f_total INT;	
+	
+	SELECT COUNT(id) INTO f_total 
+	FROM accession 
+	WHERE accession.`repo_id` = f_repo_id;
+	    
+	RETURN f_total;
+END $$
+
+DELIMITER ;
+
+-- Function to return the number of accessions that are processed for
+-- a particular repository
+DROP FUNCTION IF EXISTS GetAccessionsProcessed;
+
+DELIMITER $$
+
+CREATE FUNCTION GetAccessionsProcessed(f_repo_id INT) 
+	RETURNS INT
+BEGIN
+	DECLARE f_total INT;	
+	
+	SELECT count(T1.id) INTO f_total  
+	FROM accession T1 
+	INNER JOIN 
+		collection_management T2 ON T1.id = T2.accession_id 
+	WHERE (T1.repo_id = f_repo_id  
+	AND GetEnumValue(T2.processing_status_id) = 'completed' COLLATE utf8_general_ci);
+	    
+	RETURN f_total;
+END $$
+
+DELIMITER ;
+
+-- Function to return the number of accessions that are cataloged for
+-- a particular repository
+DROP FUNCTION IF EXISTS GetAccessionsCataloged;
+
+DELIMITER $$
+
+CREATE FUNCTION GetAccessionsCataloged(f_repo_id INT) 
+	RETURNS INT
+BEGIN
+	DECLARE f_total INT;	
+	
+	SELECT count(T2.accession_id) INTO f_total  
+	FROM event T1 
+	INNER JOIN 
+		event_link_rlshp T2 ON T1.id = T2.event_id 
+	WHERE (T1.repo_id = f_repo_id  
+	AND T2.accession_id IS NOT NULL 
+	AND GetEnumValue(T1.event_type_id) = 'cataloged' COLLATE utf8_general_ci)
+	GROUP BY T2.accession_id;
+	    
+	RETURN f_total;
+END $$
+
+DELIMITER ;
+
+-- Function to return the number of accessions with restrictions for a 
+-- particular repository
+DROP FUNCTION IF EXISTS GetAccessionsWithRestrictions;
+
+DELIMITER $$
+
+CREATE FUNCTION GetAccessionsWithRestrictions(f_repo_id INT) 
+	RETURNS INT
+BEGIN
+	DECLARE f_total INT;	
+	
+	SELECT COUNT(id) INTO f_total 
+	FROM accession 
+	WHERE (accession.`repo_id` = f_repo_id
+	AND 
+	accession.`use_restrictions` = 1);
+	    
+	RETURN f_total;
+END $$
+
+DELIMITER ;
+
+-- Function to return the number of accessions that have had rights transferred
+-- for a particular repository
+DROP FUNCTION IF EXISTS GetAccessionsWithRightsTransfered;
+
+DELIMITER $$
+
+CREATE FUNCTION GetAccessionsWithRightsTransfered(f_repo_id INT) 
+	RETURNS INT
+BEGIN
+	DECLARE f_total INT;	
+	
+	SELECT count(T2.accession_id) INTO f_total  
+	FROM event T1 
+	INNER JOIN 
+		event_link_rlshp T2 ON T1.id = T2.event_id 
+	WHERE (T1.repo_id = f_repo_id  
+	AND T2.accession_id IS NOT NULL 
+	AND GetEnumValue(T1.event_type_id) = 'rights_transferred' COLLATE utf8_general_ci)
+	GROUP BY T2.accession_id;
+	    
+	RETURN f_total;
+END $$
+
+DELIMITER ;
+
+-- Function to return the number of personal agent records
+DROP FUNCTION IF EXISTS GetAgentsPersonal;
+
+DELIMITER $$
+
+CREATE FUNCTION GetAgentsPersonal(f_repo_id INT) 
+	RETURNS INT
+BEGIN
+	DECLARE f_total INT;	
+	
+	SELECT COUNT(id) INTO f_total 
+	FROM agent_person
+	WHERE agent_person.`id` NOT IN (
+		SELECT user.`agent_record_id` 
+		FROM
+		user WHERE 
+		user.`agent_record_id` IS NOT NULL);
+	    
+	RETURN f_total;
+END $$
+
+DELIMITER ;
+
+-- Function to return the number of corporate agent records
+DROP FUNCTION IF EXISTS GetAgentsCorporate;
+
+DELIMITER $$
+
+CREATE FUNCTION GetAgentsCorporate(f_repo_id INT) 
+	RETURNS INT
+BEGIN
+	DECLARE f_total INT;	
+	
+	SELECT COUNT(id) INTO f_total 
+	FROM agent_corporate_entity 
+	WHERE agent_corporate_entity.`publish` IS NOT NULL;
+	    
+	RETURN f_total;
+END $$
+
+DELIMITER ;
+
+-- Function to return the number of family agent records
+DROP FUNCTION IF EXISTS GetAgentsFamily;
+
+DELIMITER $$
+
+CREATE FUNCTION GetAgentsFamily(f_repo_id INT) 
+	RETURNS INT
+BEGIN
+	DECLARE f_total INT;	
+	
+	SELECT COUNT(id) INTO f_total 
+	FROM agent_family;
+	    
+	RETURN f_total;
+END $$
+
+DELIMITER ;
+
+-- Function to return the number of software agent records
+DROP FUNCTION IF EXISTS GetAgentsSoftware;
+
+DELIMITER $$
+
+CREATE FUNCTION GetAgentsSoftware(f_repo_id INT) 
+	RETURNS INT
+BEGIN
+	DECLARE f_total INT;	
+	
+	SELECT COUNT(id) INTO f_total 
+	FROM agent_software
+	WHERE agent_software.`system_role` = 'none';
+	    
+	RETURN f_total;
+END $$
+
+DELIMITER ;
+
+-- Function to return the number of subject records
+DROP FUNCTION IF EXISTS GetTotalSubjects;
+
+DELIMITER $$
+
+CREATE FUNCTION GetTotalSubjects(f_repo_id INT) 
+	RETURNS INT
+BEGIN
+	DECLARE f_total INT;	
+	
+	SELECT COUNT(id) INTO f_total 
+	FROM subject;
+	    
+	RETURN f_total;
 END $$
 
 DELIMITER ;
