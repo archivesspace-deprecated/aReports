@@ -6,11 +6,15 @@
 package areports;
 
 import areports.model.JasperReportInfo;
+import areports.model.RepositoryInfo;
 import areports.utils.ReportUtils;
 import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.TreeMap;
@@ -60,6 +64,8 @@ public class AReportsFrame extends javax.swing.JFrame {
 
     /**
      * Method to load stored stored preferences
+     * @param reportsDirectory
+     * @param localASpaceDirectory
      */
     public void loadPreferences(File reportsDirectory, String localASpaceDirectory) {
         this.reportsDirectory = reportsDirectory;
@@ -174,12 +180,14 @@ public class AReportsFrame extends javax.swing.JFrame {
         previewButton = new javax.swing.JButton();
         jLabel11 = new javax.swing.JLabel();
         statusLabel = new javax.swing.JLabel();
+        jLabel13 = new javax.swing.JLabel();
+        repositoryComboBox = new javax.swing.JComboBox();
         pushButton = new javax.swing.JButton();
         statusTextField = new javax.swing.JTextField();
         jLabel12 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("aReports -- A Desktop Archivesspace Reports Engine");
+        setTitle("aReports -- A Desktop Archivesspace Reports Engine (v0.1 12/15/2014)");
 
         closeButton.setText("Close");
         closeButton.addActionListener(new java.awt.event.ActionListener() {
@@ -350,6 +358,10 @@ public class AReportsFrame extends javax.swing.JFrame {
 
         statusLabel.setText("Not compiled ...");
 
+        jLabel13.setText("Select Repository");
+
+        repositoryComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "No Repositories Loaded ..." }));
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -359,9 +371,14 @@ public class AReportsFrame extends javax.swing.JFrame {
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel8)
                     .addComponent(jLabel10)
-                    .addComponent(jLabel9))
+                    .addComponent(jLabel9)
+                    .addComponent(jLabel13))
                 .addGap(30, 30, 30)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addComponent(repositoryComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(previewButton))
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addComponent(reportsDirectoryTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 463, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -377,8 +394,7 @@ public class AReportsFrame extends javax.swing.JFrame {
                         .addComponent(jLabel11)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(statusLabel)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(previewButton))))
+                        .addGap(0, 0, Short.MAX_VALUE))))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -395,14 +411,20 @@ public class AReportsFrame extends javax.swing.JFrame {
                     .addComponent(reportsComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel10)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addComponent(jLabel10)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 94, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel11)
+                    .addComponent(statusLabel))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(previewButton)
-                    .addComponent(jLabel11)
-                    .addComponent(statusLabel))
-                .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(jLabel13)
+                    .addComponent(repositoryComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap())
         );
 
         pushButton.setText("Push Reports");
@@ -425,22 +447,19 @@ public class AReportsFrame extends javax.swing.JFrame {
             .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(connectButton)
-                    .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jLabel12)))
+                .addComponent(connectButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(disconnectButton)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(pushButton)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(closeButton))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(statusTextField)
-                        .addContainerGap())))
+                .addComponent(disconnectButton)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(pushButton)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(closeButton))
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel12)
+                .addGap(57, 57, 57)
+                .addComponent(statusTextField)
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -449,12 +468,12 @@ public class AReportsFrame extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 212, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(statusTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel12))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(closeButton)
                     .addComponent(connectButton)
@@ -504,7 +523,10 @@ public class AReportsFrame extends javax.swing.JFrame {
         try {
             HashMap<String, Object> parameterMap = new HashMap<>();
             parameterMap.put("basePath", currentReportInfo.getParentDirectoryName());
-
+            
+            RepositoryInfo repositoryInfo = (RepositoryInfo)repositoryComboBox.getSelectedItem();
+            parameterMap.put("repositoryId", repositoryInfo.getRepositoryId());
+            
             jasperReport = JasperCompileManager.compileReport(currentReportInfo.getFileName());
             jasperPrint = JasperFillManager.fillReport(jasperReport, parameterMap, connection);
 
@@ -573,11 +595,36 @@ public class AReportsFrame extends javax.swing.JFrame {
             previewButton.setEnabled(true);
             disconnectButton.setEnabled(true);
             statusTextField.setText("Connected to Databae ...");
+            
+            // now load the repositories
+            loadRepositories();
         } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
         }
     }//GEN-LAST:event_connectButtonActionPerformed
+    
+    /**
+     * Method to load the repositories from ASpace
+     */
+    private void loadRepositories() {
+        try {
+            Statement stmt = connection.createStatement();
+            String sql = "SELECT id, name FROM repository WHERE id != 1 ORDER BY name";
+            ResultSet result = stmt.executeQuery(sql);
 
+            //Print the data to the console
+            repositoryComboBox.removeAllItems();
+            
+            while(result.next()){
+                int id = result.getInt("id");
+                String name = result.getString("name");
+                repositoryComboBox.addItem(new RepositoryInfo(id, name));
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(AReportsFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
     /**
      * Method to disconnect from the database connection
      *
@@ -648,6 +695,7 @@ public class AReportsFrame extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
+    private javax.swing.JLabel jLabel13;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -669,6 +717,7 @@ public class AReportsFrame extends javax.swing.JFrame {
     private javax.swing.JTextArea reportDescriptionTextArea;
     private javax.swing.JComboBox reportsComboBox;
     private javax.swing.JTextField reportsDirectoryTextField;
+    private javax.swing.JComboBox repositoryComboBox;
     private javax.swing.JTextField sftpHostTextField;
     private javax.swing.JPasswordField sftpPasswordField;
     private javax.swing.JTextField sftpUsernameTextField;
