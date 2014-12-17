@@ -4,7 +4,7 @@
 	<property name="ireport.encoding" value="UTF-8"/>
 	<property name="ireport.zoom" value="1.0"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="521"/>
+	<property name="ireport.y" value="533"/>
 	<import value="net.sf.jasperreports.engine.*"/>
 	<import value="java.util.*"/>
 	<import value="net.sf.jasperreports.engine.data.*"/>
@@ -135,7 +135,10 @@ WHERE repository.`id` = $P{repositoryId}]]>
 				</staticText>
 				<subreport isUsingCache="true">
 					<reportElement key="subreport-6" positionType="Float" x="20" y="53" width="180" height="40" uuid="e1c52ffe-5d9f-41f4-85c6-c7d5c0a6d339"/>
-					<connectionExpression><![CDATA[]]></connectionExpression>
+					<subreportParameter name="repositoryId">
+						<subreportParameterExpression><![CDATA[$P{repositoryId}]]></subreportParameterExpression>
+					</subreportParameter>
+					<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
 					<subreportExpression><![CDATA[$P{basePath} + "/sub_subjectStats.jasper"]]></subreportExpression>
 				</subreport>
 			</band>
@@ -306,7 +309,10 @@ WHERE repository.`id` = $P{repositoryId}]]>
 			<band height="95" splitType="Stretch">
 				<subreport isUsingCache="true">
 					<reportElement key="subreport-1" positionType="Float" x="10" y="56" width="481" height="32" uuid="435fc64a-0670-4d8e-ac27-1757aa0fe51e"/>
-					<connectionExpression><![CDATA[]]></connectionExpression>
+					<subreportParameter name="repositoryId">
+						<subreportParameterExpression><![CDATA[$P{repositoryId}]]></subreportParameterExpression>
+					</subreportParameter>
+					<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
 					<subreportExpression><![CDATA[$P{basePath} + "/sub_extentStats.jasper"]]></subreportExpression>
 				</subreport>
 				<textField pattern="#,##0" isBlankWhenNull="false">
@@ -866,17 +872,26 @@ WHERE repository.`id` = $P{repositoryId}]]>
 			</staticText>
 			<subreport isUsingCache="true">
 				<reportElement key="subreport-2" x="239" y="122" width="200" height="32" uuid="7bc3a9cb-14ca-4c2f-a708-e2b40365b529"/>
-				<connectionExpression><![CDATA[]]></connectionExpression>
+				<subreportParameter name="repositoryId">
+					<subreportParameterExpression><![CDATA[$P{repositoryId}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
 				<subreportExpression><![CDATA[$P{basePath} + "/sub_findingAidStatusStats.jasper"]]></subreportExpression>
 			</subreport>
 			<subreport isUsingCache="true">
 				<reportElement key="subreport-3" positionType="Float" x="20" y="171" width="199" height="32" uuid="3f36251b-27ed-421f-be77-a234c9d6306f"/>
-				<connectionExpression><![CDATA[]]></connectionExpression>
+				<subreportParameter name="repositoryId">
+					<subreportParameterExpression><![CDATA[$P{repositoryId}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
 				<subreportExpression><![CDATA[$P{basePath} + "/sub_languageStats.jasper"]]></subreportExpression>
 			</subreport>
 			<subreport isUsingCache="true">
 				<reportElement key="subreport-5" positionType="Float" x="239" y="171" width="200" height="32" uuid="c90bdef1-92dd-4521-9926-14ca2157919d"/>
-				<connectionExpression><![CDATA[]]></connectionExpression>
+				<subreportParameter name="repositoryId">
+					<subreportParameterExpression><![CDATA[$P{repositoryId}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
 				<subreportExpression><![CDATA[$P{basePath} + "/sub_instanceStats.jasper"]]></subreportExpression>
 			</subreport>
 			<staticText>
