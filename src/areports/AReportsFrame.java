@@ -14,7 +14,6 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.TreeMap;
@@ -81,7 +80,7 @@ public class AReportsFrame extends javax.swing.JFrame {
         value = preferences.get("jdbc.password", "clubfoots37@freakiest");
         jdbcPasswordField.setText(value);
 
-        value = preferences.get("sftp.host", "sftp://localhost:22");
+        value = preferences.get("sftp.host", "localhost:22");
         sftpHostTextField.setText(value);
 
         value = preferences.get("sftp.username", "aspace");
@@ -187,7 +186,7 @@ public class AReportsFrame extends javax.swing.JFrame {
         jLabel12 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("aReports -- A Desktop Archivesspace Reports Engine (v0.1 12/15/2014)");
+        setTitle("aReports -- A Desktop Archivesspace Reports Engine (v0.1 12/22/2014)");
 
         closeButton.setText("Close");
         closeButton.addActionListener(new java.awt.event.ActionListener() {
@@ -196,7 +195,6 @@ public class AReportsFrame extends javax.swing.JFrame {
             }
         });
 
-        connectButton.setBackground(java.awt.Color.red);
         connectButton.setText("Connect");
         connectButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -599,7 +597,7 @@ public class AReportsFrame extends javax.swing.JFrame {
             // now load the repositories
             loadRepositories();
         } catch (SQLException | ClassNotFoundException e) {
-            e.printStackTrace();
+            Logger.getLogger(AReportsFrame.class.getName()).log(Level.SEVERE, null, e);
         }
     }//GEN-LAST:event_connectButtonActionPerformed
     
