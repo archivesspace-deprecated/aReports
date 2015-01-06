@@ -112,7 +112,7 @@ END $$
 DELIMITER ;
 
 
--- Function to return the number of resources for a particular repository
+-- Function to return enum value given an id
 DROP FUNCTION IF EXISTS GetEnumValue;
 
 DELIMITER $$
@@ -130,6 +130,27 @@ BEGIN
 END $$
 
 DELIMITER ;
+
+
+-- Function to return the enum value with the first letter capitalize
+DROP FUNCTION IF EXISTS GetEnumValueUF;
+
+DELIMITER $$
+
+CREATE FUNCTION GetEnumValueUF(f_enum_id INT) 
+	RETURNS VARCHAR(255)
+BEGIN
+	DECLARE f_value VARCHAR(255);	
+	DECLARE f_ovalue VARCHAR(255);
+        
+        SET f_ovalue = GetEnumValue(f_enum_id);
+	SET f_value = CONCAT(UCASE(LEFT(f_ovalue, 1)), SUBSTRING(f_ovalue, 2));
+	    
+	RETURN f_value;
+END $$
+
+DELIMITER ;
+
 
 -- Function to return the number of resources for a particular repository
 DROP FUNCTION IF EXISTS GetTotalResources;
@@ -434,6 +455,36 @@ END $$
 
 DELIMITER ;
 
+
+-- Function to return the agent type i.e. Person, Family, Corporate, Software
+-- when those ids found in the linked_agents_rlshp are passed in as parameters
+DROP FUNCTION IF EXISTS GetAgentMatch;
+
+DELIMITER $$
+
+CREATE FUNCTION GetAgentMatch(f_agent_type VARCHAR(10), f_agent_id INT, 
+                              f_person_id INT, f_family_id INT, f_corporate_id INT, f_software_id INT) 
+	RETURNS INT
+BEGIN
+	DECLARE f_agent_match INT;	
+	
+	IF f_agent_type = 'Person' AND f_person_id = f_agent_id THEN
+            SET f_agent_match = 1;
+        ELSEIF f_agent_type = 'Family' AND f_family_id = f_agent_id THEN
+            SET f_agent_match = 1;
+        ELSEIF f_agent_type = 'Corporate' AND f_corporate_id = f_agent_id THEN
+            SET f_agent_match = 1;
+        ELSEIF f_agent_type = 'Software' AND f_software_id = f_agent_id THEN
+            SET f_agent_match = 1;
+        ELSE 
+            SET f_agent_match = 0;
+        END IF;
+
+	RETURN f_agent_match;
+END $$
+
+DELIMITER ; 
+
 -- Function to return the number of subject records
 DROP FUNCTION IF EXISTS GetTotalSubjects;
 
@@ -518,7 +569,7 @@ BEGIN
 		resource T1
 	INNER JOIN
     		instance T2 ON GetResourceId(T2.`resource_id`, T2.`archival_object_id`) = T1.`id`
-    WHERE 
+                WHERE 
 		T1.`repo_id` = f_repo_id
 		AND
     		T2.`instance_type_id` = f_instance_type_id 
@@ -616,7 +667,7 @@ BEGIN
 	
 	SELECT COUNT(T1.`id`) INTO f_total 
 	FROM 
-		term T1
+            term T1
 	INNER JOIN
 	    subject_term T2 ON T1.`id` = T2.`term_id`
 	WHERE
@@ -625,6 +676,37 @@ BEGIN
 	    T2.`subject_id`;
 	
 	RETURN f_total;
+END $$
+
+DELIMITER ;
+
+-- Function to return the date expression for a digital object
+DROP FUNCTION IF EXISTS GetDigitalObjectDateExpression;
+
+DELIMITER $$
+
+CREATE FUNCTION GetDigitalObjectDateExpression(f_record_id INT) 
+	RETURNS VARCHAR(255)
+BEGIN
+	DECLARE f_value VARCHAR(255);
+        DECLARE f_expression VARCHAR(255);
+        DECLARE f_begin VARCHAR(255);
+        DECLARE f_end VARCHAR(255);
+	
+	SELECT date.`expression`, date.`begin`, date.`end` 
+        INTO f_expression, f_begin, f_end 
+	FROM 
+            date 
+	WHERE date.`digital_object_id` = f_record_id;
+	
+        -- If the expression is null return the concat of begin and end
+        IF f_expression IS NULL THEN
+            SET f_value = CONCAT(f_begin, '-', f_end);
+        ELSE
+            SET f_value = f_expression;
+        END IF;
+    
+	RETURN f_value;
 END $$
 
 DELIMITER ;
