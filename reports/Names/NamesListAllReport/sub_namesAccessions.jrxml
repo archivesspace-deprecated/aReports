@@ -20,7 +20,8 @@
      T1.`accession_id` AS rlshp_accession_id,
      T2.`identifier` AS identifier,
      T2.`title` AS title,
-     T2.`accession_date` AS date
+     T2.`accession_date` AS date,
+     GetAccessionDateExpression(T1.`accession_id`) AS dateExpression
 FROM
      `linked_agents_rlshp` T1
 INNER JOIN
@@ -43,6 +44,7 @@ GROUP BY
 		<fieldDescription><![CDATA[]]></fieldDescription>
 	</field>
 	<field name="date" class="java.sql.Date"/>
+	<field name="dateExpression" class="java.lang.String"/>
 	<variable name="TEST_ACCESSIONS" class="java.lang.Integer" resetType="None" calculation="Sum">
 		<variableExpression><![CDATA[]]></variableExpression>
 	</variable>
@@ -97,7 +99,7 @@ GROUP BY
 					<font fontName="Arial" size="10" isBold="false" isItalic="false" isUnderline="true" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
-				<text><![CDATA[Date]]></text>
+				<text><![CDATA[Dates:]]></text>
 			</staticText>
 			<staticText>
 				<reportElement key="staticText-8" positionType="Float" mode="Opaque" x="5" y="19" width="56" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="22b2a81f-a5b9-4277-96a3-61dc45f781a5"/>
@@ -131,7 +133,7 @@ GROUP BY
 				</textElement>
 				<textFieldExpression><![CDATA[$F{title}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" pattern="yyyy/MM/dd" isBlankWhenNull="true">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 				<reportElement key="textField" mode="Opaque" x="355" y="2" width="144" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="b54c5fd2-dd9d-42da-9415-70bd0361170e"/>
 				<box leftPadding="2">
 					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -143,7 +145,7 @@ GROUP BY
 					<font fontName="Arial" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{date}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{dateExpression}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
 				<reportElement key="textField-5" mode="Opaque" x="5" y="2" width="117" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="d7a8174a-15e5-46dc-afc7-b4558ff8a43d"/>

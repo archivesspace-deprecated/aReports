@@ -680,6 +680,38 @@ END $$
 
 DELIMITER ;
 
+-- Function to return the date expression for an accession record
+DROP FUNCTION IF EXISTS GetAccessionDateExpression;
+
+DELIMITER $$
+
+CREATE FUNCTION GetAccessionDateExpression(f_record_id INT) 
+	RETURNS VARCHAR(255)
+BEGIN
+	DECLARE f_value VARCHAR(255);
+        DECLARE f_expression VARCHAR(255);
+        DECLARE f_begin VARCHAR(255);
+        DECLARE f_end VARCHAR(255);
+	
+	SELECT date.`expression`, date.`begin`, date.`end` 
+        INTO f_expression, f_begin, f_end 
+	FROM 
+            date 
+	WHERE date.`accession_id` = f_record_id 
+        LIMIT 1;
+	
+        -- If the expression is null return the concat of begin and end
+        IF f_expression IS NULL THEN
+            SET f_value = CONCAT(f_begin, '-', f_end);
+        ELSE
+            SET f_value = f_expression;
+        END IF;
+    
+	RETURN f_value;
+END $$
+
+DELIMITER ;
+
 -- Function to return the date expression for a digital object
 DROP FUNCTION IF EXISTS GetDigitalObjectDateExpression;
 
@@ -697,7 +729,40 @@ BEGIN
         INTO f_expression, f_begin, f_end 
 	FROM 
             date 
-	WHERE date.`digital_object_id` = f_record_id;
+	WHERE date.`digital_object_id` = f_record_id
+        LIMIT 1;
+	
+        -- If the expression is null return the concat of begin and end
+        IF f_expression IS NULL THEN
+            SET f_value = CONCAT(f_begin, '-', f_end);
+        ELSE
+            SET f_value = f_expression;
+        END IF;
+    
+	RETURN f_value;
+END $$
+
+DELIMITER ;
+
+-- Function to return the date expression for a resource record
+DROP FUNCTION IF EXISTS GetResourceDateExpression;
+
+DELIMITER $$
+
+CREATE FUNCTION GetResourceDateExpression(f_record_id INT) 
+	RETURNS VARCHAR(255)
+BEGIN
+	DECLARE f_value VARCHAR(255);
+        DECLARE f_expression VARCHAR(255);
+        DECLARE f_begin VARCHAR(255);
+        DECLARE f_end VARCHAR(255);
+	
+	SELECT date.`expression`, date.`begin`, date.`end` 
+        INTO f_expression, f_begin, f_end 
+	FROM 
+            date 
+	WHERE date.`resource_id` = f_record_id 
+        LIMIT 1;
 	
         -- If the expression is null return the concat of begin and end
         IF f_expression IS NULL THEN
