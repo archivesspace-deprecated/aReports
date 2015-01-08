@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="SubjectsRecords" pageWidth="612" pageHeight="792" columnWidth="532" leftMargin="40" rightMargin="40" topMargin="50" bottomMargin="18" uuid="23f25813-30bb-4959-96c2-93fd50dbd4cf">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="NameRecords" pageWidth="612" pageHeight="792" columnWidth="532" leftMargin="40" rightMargin="40" topMargin="50" bottomMargin="18" uuid="23f25813-30bb-4959-96c2-93fd50dbd4cf">
 	<property name="reportTitle" value="Name list"/>
 	<property name="reportDescription" value="Displays selected name record(s). Report lists name, name type, and name source."/>
 	<property name="ireport.scriptlethandling" value="0"/>

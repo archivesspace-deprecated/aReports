@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="TestNotesReport" language="groovy" pageWidth="612" pageHeight="792" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="be855b46-573a-4311-bac3-a0656f4cfe21">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="12"/>
+	<scriptlet name="NotesScriptlet" class="areports.scriptlets.NotesScriptlet"/>
+	<queryString>
+		<![CDATA[SELECT
+     note.`id` AS note_id,
+     CONVERT(notes USING utf8) AS note_notes
+FROM
+     `note` note]]>
+	</queryString>
+	<field name="note_id" class="java.lang.Integer"/>
+	<field name="note_notes" class="java.lang.String"/>
+	<variable name="jsonText" class="java.lang.String" resetType="None">
+		<initialValueExpression><![CDATA["Test"]]></initialValueExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="79" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="247" height="52" uuid="6ff8c716-6751-480b-9da1-b11045f8d7d3"/>
+				<textElement>
+					<font size="36" isBold="true" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Test JSON Notes]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="35" splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="61" splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="125" splitType="Stretch">
+			<textField>
+				<reportElement x="1" y="4" width="100" height="20" uuid="216974b2-1917-44d7-b60b-5afa452bd3f3"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{note_id}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement x="3" y="26" width="569" height="20" uuid="acfcaab8-d351-4207-a06b-f09c2509040c"/>
+				<textFieldExpression><![CDATA[$F{note_notes}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="3" y="91" width="569" height="20" uuid="11722311-e76e-49f1-a673-f393ee43db52"/>
+				<textFieldExpression><![CDATA[$V{jsonText}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="1" y="90" width="569" height="1" uuid="faa5b97f-6515-45a5-a36a-baf3c255a2cf"/>
+			</line>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="45" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="54" splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>

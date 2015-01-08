@@ -6,19 +6,20 @@
 	<property name="ireport.encoding" value="UTF-8"/>
 	<property name="ireport.zoom" value="1.0"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="94"/>
+	<property name="ireport.y" value="111"/>
 	<import value="net.sf.jasperreports.engine.*"/>
 	<import value="java.util.*"/>
 	<import value="net.sf.jasperreports.engine.data.*"/>
 	<parameter name="basePath" class="java.lang.String"/>
 	<parameter name="ReportHeader" class="java.lang.String" isForPrompting="false"/>
 	<queryString>
-		<![CDATA[(SELECT sort_name AS sortName, 'Person' AS nameType,  GetEnumValueUF(source_id) AS nameSource, agent_person_id AS agentId FROM name_person WHERE source_id IS NOT NULL AND (SELECT id FROM user WHERE agent_record_id = agent_person_id) IS NULL)
+		<![CDATA[(SELECT id AS nameId, sort_name AS sortName, 'Person' AS nameType,  GetEnumValueUF(source_id) AS nameSource, agent_person_id AS agentId FROM name_person WHERE source_id IS NOT NULL AND (SELECT id FROM user WHERE agent_record_id = agent_person_id) IS NULL)
 UNION
-(SELECT sort_name AS sortName, 'Family' AS nameType,  GetEnumValueUF(source_id) AS nameSource, agent_family_id AS agentId FROM name_family WHERE source_id IS NOT NULL)
+(SELECT id AS nameId, sort_name AS sortName, 'Family' AS nameType,  GetEnumValueUF(source_id) AS nameSource, agent_family_id AS agentId FROM name_family WHERE source_id IS NOT NULL)
 UNION
-(SELECT sort_name AS sortName, 'Corporate' AS nameType,  GetEnumValueUF(source_id) AS nameSource, agent_corporate_entity_id AS agentId FROM name_corporate_entity WHERE source_id IS NOT NULL)]]>
+(SELECT id AS nameId, sort_name AS sortName, 'Corporate' AS nameType,  GetEnumValueUF(source_id) AS nameSource, agent_corporate_entity_id AS agentId FROM name_corporate_entity WHERE source_id IS NOT NULL)]]>
 	</queryString>
+	<field name="nameId" class="java.lang.Integer"/>
 	<field name="sortName" class="java.lang.String"/>
 	<field name="nameType" class="java.lang.String"/>
 	<field name="nameSource" class="java.lang.String"/>
