@@ -6,19 +6,25 @@
 	<property name="ireport.encoding" value="UTF-8"/>
 	<property name="ireport.zoom" value="1.0"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="250"/>
+	<property name="ireport.y" value="220"/>
 	<import value="net.sf.jasperreports.engine.*"/>
 	<import value="java.util.*"/>
 	<import value="net.sf.jasperreports.engine.data.*"/>
+	<scriptlet name="NotesScriptlet" class="areports.scriptlets.NotesScriptlet"/>
 	<parameter name="basePath" class="java.lang.String"/>
 	<parameter name="ReportHeader" class="java.lang.String" isForPrompting="false"/>
+	<parameter name="reportName" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["NamesRecordReport"]]></defaultValueExpression>
+	</parameter>
 	<queryString>
 		<![CDATA[(SELECT T1.id AS parentNameId, T1.sort_name AS sortName, 'Person' AS nameType,  'name_person' AS nameTable, 'agent_person_id' AS agentIdColumn, GetEnumValueUF(T1.source_id) AS nameSource, T1.agent_person_id AS agentId,
-CONVERT(T2.notes USING utf8) AS notes
+CONVERT(T2.notes USING utf8) AS notesJSON
 FROM
      name_person T1
 INNER JOIN
-     note T2 ON T1.id = T2.agent_person_id
+     note T2 ON T1.agent_person_id = T2.agent_person_id
+INNER JOIN
+     agent_contact T3 ON T1.agent_person_id = T3.agent_person_id
 WHERE
      T1.source_id IS NOT NULL AND (SELECT id FROM user WHERE agent_record_id = T1.agent_person_id) IS NULL
 )
@@ -29,7 +35,9 @@ UNION
 FROM
      name_family T1
 INNER JOIN
-     note T2 ON T1.id = T2.agent_family_id
+     note T2 ON T1.agent_family_id = T2.agent_family_id
+INNER JOIN
+     agent_contact T3 ON T1.agent_family_id = T3.agent_family_id
 WHERE
      T1.source_id IS NOT NULL
 )
@@ -40,7 +48,9 @@ UNION
 FROM
      name_corporate_entity T1
 INNER JOIN
-     note T2 ON T1.id = T2.agent_corporate_entity_id
+     note T2 ON T1.agent_corporate_entity_id = T2.agent_corporate_entity_id
+INNER JOIN
+     agent_contact T3 ON T1.agent_corporate_entity_id = T3.agent_corporate_entity_id
 WHERE
      T1.source_id IS NOT NULL
 )]]>
@@ -52,18 +62,10 @@ WHERE
 	<field name="agentIdColumn" class="java.lang.String"/>
 	<field name="nameSource" class="java.lang.String"/>
 	<field name="agentId" class="java.lang.Integer"/>
-	<field name="notes" class="java.lang.Object">
-		<fieldDescription><![CDATA[]]></fieldDescription>
-	</field>
-	<variable name="nonPreferredNamesDataSource" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource">
-		<variableExpression><![CDATA[new JRBeanCollectionDataSource(new ArrayList($F{nonPreferredNames}))]]></variableExpression>
-	</variable>
-	<variable name="contactNotesDataSource" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource">
-		<variableExpression><![CDATA[new JRBeanCollectionDataSource(new ArrayList($F{contactNotes}))]]></variableExpression>
-	</variable>
-	<variable name="notesDataSource" class="net.sf.jasperreports.engine.data.JsonDataSource">
-		<variableExpression><![CDATA[new JsonDataSource()]]></variableExpression>
-	</variable>
+	<field name="notesJSON" class="java.lang.String"/>
+	<variable name="descriptionType" class="java.lang.String"/>
+	<variable name="descriptionNote" class="java.lang.String"/>
+	<variable name="citation" class="java.lang.String"/>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
@@ -413,7 +415,7 @@ WHERE
 					<font fontName="Arial" size="10" isBold="false" isItalic="false" isUnderline="true" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{descriptionType}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$V{descriptionType}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
 				<reportElement key="textField-17" positionType="Float" mode="Transparent" x="10" y="122" width="511" height="15" isRemoveLineWhenBlank="true" forecolor="#000000" backcolor="#FFFFFF" uuid="975244ed-15a9-487a-abb4-c8f85cfa6e37"/>
@@ -427,7 +429,7 @@ WHERE
 					<font fontName="Arial" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{descriptionNote}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$V{descriptionNote}]]></textFieldExpression>
 			</textField>
 			<subreport isUsingCache="true" runToBottom="false">
 				<reportElement key="subreport-3" positionType="Float" isPrintRepeatedValues="false" mode="Transparent" x="11" y="94" width="511" height="12" isRemoveLineWhenBlank="true" forecolor="#000000" backcolor="#FFFFFF" uuid="42d12398-029e-4fae-936a-585ffb29d1c6"/>
@@ -446,7 +448,7 @@ WHERE
 					<font fontName="Arial" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{citation}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$V{citation}]]></textFieldExpression>
 			</textField>
 			<line>
 				<reportElement key="line-1" positionType="Float" mode="Opaque" x="1" y="10" width="533" height="1" forecolor="#000000" backcolor="#FFFFFF" uuid="56391419-e3c7-4e3f-b990-a3ba9043d8b0"/>

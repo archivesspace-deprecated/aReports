@@ -2,20 +2,25 @@
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="TestNotesReport" language="groovy" pageWidth="612" pageHeight="792" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="be855b46-573a-4311-bac3-a0656f4cfe21">
 	<property name="ireport.zoom" value="1.0"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="12"/>
+	<property name="ireport.y" value="0"/>
 	<scriptlet name="NotesScriptlet" class="areports.scriptlets.NotesScriptlet"/>
+	<parameter name="reportName" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["NamesRecordReport"]]></defaultValueExpression>
+	</parameter>
 	<queryString>
 		<![CDATA[SELECT
      note.`id` AS note_id,
-     CONVERT(notes USING utf8) AS note_notes
+     CONVERT(notes USING utf8) AS notesJSON
 FROM
-     `note` note]]>
+     `note` note
+WHERE
+     agent_person_id IS NOT NULL OR agent_family_id IS NOT NULL OR agent_corporate_entity_id IS NOT NULL]]>
 	</queryString>
 	<field name="note_id" class="java.lang.Integer"/>
-	<field name="note_notes" class="java.lang.String"/>
-	<variable name="jsonText" class="java.lang.String" resetType="None">
-		<initialValueExpression><![CDATA["Test"]]></initialValueExpression>
-	</variable>
+	<field name="notesJSON" class="java.lang.String"/>
+	<variable name="descriptionType" class="java.lang.String"/>
+	<variable name="descriptionNote" class="java.lang.String"/>
+	<variable name="citation" class="java.lang.String"/>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
@@ -37,7 +42,7 @@ FROM
 		<band height="61" splitType="Stretch"/>
 	</columnHeader>
 	<detail>
-		<band height="125" splitType="Stretch">
+		<band height="157" splitType="Stretch">
 			<textField>
 				<reportElement x="1" y="4" width="100" height="20" uuid="216974b2-1917-44d7-b60b-5afa452bd3f3"/>
 				<textElement>
@@ -47,15 +52,23 @@ FROM
 			</textField>
 			<textField isStretchWithOverflow="true">
 				<reportElement x="3" y="26" width="569" height="20" uuid="acfcaab8-d351-4207-a06b-f09c2509040c"/>
-				<textFieldExpression><![CDATA[$F{note_notes}]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement x="3" y="91" width="569" height="20" uuid="11722311-e76e-49f1-a673-f393ee43db52"/>
-				<textFieldExpression><![CDATA[$V{jsonText}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{notesJSON}]]></textFieldExpression>
 			</textField>
 			<line>
 				<reportElement x="1" y="90" width="569" height="1" uuid="faa5b97f-6515-45a5-a36a-baf3c255a2cf"/>
 			</line>
+			<textField>
+				<reportElement x="1" y="91" width="569" height="20" uuid="6dab1888-dd34-47d1-aa8e-97d31c0d5286"/>
+				<textFieldExpression><![CDATA[$V{descriptionType}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="15" y="111" width="555" height="20" uuid="1a3cee03-9152-4219-a8e8-0e37baaa0b7f"/>
+				<textFieldExpression><![CDATA[$V{descriptionNote}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="15" y="131" width="536" height="20" uuid="866938fe-7c07-40ff-9faf-6641f188c6d8"/>
+				<textFieldExpression><![CDATA[$V{citation}]]></textFieldExpression>
+			</textField>
 		</band>
 	</detail>
 	<columnFooter>
