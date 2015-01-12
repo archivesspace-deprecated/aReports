@@ -520,7 +520,7 @@ public class AReportsFrame extends javax.swing.JFrame {
         }
 
         try {
-            HashMap<String, Object> parameterMap = new HashMap<>();
+            HashMap<String, Object> parameterMap = new HashMap<String, Object>();
             parameterMap.put("basePath", currentReportInfo.getParentDirectoryName());
             
             RepositoryInfo repositoryInfo = (RepositoryInfo)repositoryComboBox.getSelectedItem();
@@ -597,7 +597,7 @@ public class AReportsFrame extends javax.swing.JFrame {
             
             // now load the repositories
             loadRepositories();
-        } catch (SQLException | ClassNotFoundException e) {
+        } catch (Exception e) {
             Logger.getLogger(AReportsFrame.class.getName()).log(Level.SEVERE, null, e);
         }
     }//GEN-LAST:event_connectButtonActionPerformed

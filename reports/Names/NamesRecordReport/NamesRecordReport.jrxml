@@ -6,7 +6,7 @@
 	<property name="ireport.encoding" value="UTF-8"/>
 	<property name="ireport.zoom" value="1.0"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="220"/>
+	<property name="ireport.y" value="256"/>
 	<import value="net.sf.jasperreports.engine.*"/>
 	<import value="java.util.*"/>
 	<import value="net.sf.jasperreports.engine.data.*"/>
@@ -17,8 +17,18 @@
 		<defaultValueExpression><![CDATA["NamesRecordReport"]]></defaultValueExpression>
 	</parameter>
 	<queryString>
-		<![CDATA[(SELECT T1.id AS parentNameId, T1.sort_name AS sortName, 'Person' AS nameType,  'name_person' AS nameTable, 'agent_person_id' AS agentIdColumn, GetEnumValueUF(T1.source_id) AS nameSource, T1.agent_person_id AS agentId,
-CONVERT(T2.notes USING utf8) AS notesJSON
+		<![CDATA[(SELECT T1.id AS parentNameId, T1.sort_name AS sortName, 'Person' AS nameType,  'name_person' AS nameTable, 'agent_person_id' AS agentIdColumn, GetEnumValueUF(T1.source_id) AS nameSource, GetEnumValueUF(T1.rules_id) AS nameRule, T1.agent_person_id AS agentId, CONVERT(T2.notes USING utf8) AS notesJSON,
+     GetEnumValueUF(T3.salutation_id) AS salutation,
+     T3.name AS contactName,
+     T3.address_1 AS contactAddress1,
+     T3.address_2 AS contactAddress2,
+     T3.city AS contactCity,
+     T3.region AS contactRegion,
+     T3.country AS contactCountry,
+     T3.post_code AS contactMailCode,
+     T3.telephone AS contactPhone,
+     T3.fax AS contactFax,
+     T3.email AS contactEmail
 FROM
      name_person T1
 INNER JOIN
@@ -31,7 +41,18 @@ WHERE
 
 UNION
 
-(SELECT T1.id AS parentNameId, T1.sort_name AS sortName, 'Family' AS nameType,  'name_family' AS nameTable, 'agent_family_id' AS agentIdColumn, GetEnumValueUF(T1.source_id) AS nameSource, T1.agent_family_id AS agentId, CONVERT(T2.notes USING utf8) AS notes
+(SELECT T1.id AS parentNameId, T1.sort_name AS sortName, 'Family' AS nameType,  'name_family' AS nameTable, 'agent_family_id' AS agentIdColumn, GetEnumValueUF(T1.source_id) AS nameSource, GetEnumValueUF(T1.rules_id) AS nameRule, T1.agent_family_id AS agentId, CONVERT(T2.notes USING utf8) AS notesJSON,
+     GetEnumValueUF(T3.salutation_id) AS salutation,
+     T3.name AS contactName,
+     T3.address_1 AS contactAddress1,
+     T3.address_2 AS contactAddress2,
+     T3.city AS contactCity,
+     T3.region AS contactRegion,
+     T3.country AS contactCountry,
+     T3.post_code AS contactMailCode,
+     T3.telephone AS contactPhone,
+     T3.fax AS contactFax,
+     T3.email AS contactEmail
 FROM
      name_family T1
 INNER JOIN
@@ -44,7 +65,18 @@ WHERE
 
 UNION
 
-(SELECT T1.id AS parentNameId, T1.sort_name AS sortName, 'Corporate' AS nameType, 'name_corporate_entity' AS nameTable, 'agent_corporate_entity_id' AS agentIdColumn, GetEnumValueUF(T1.source_id) AS nameSource, T1.agent_corporate_entity_id AS agentId, CONVERT(T2.notes USING utf8) AS notes
+(SELECT T1.id AS parentNameId, T1.sort_name AS sortName, 'Corporate' AS nameType, 'name_corporate_entity' AS nameTable, 'agent_corporate_entity_id' AS agentIdColumn, GetEnumValueUF(T1.source_id) AS nameSource, GetEnumValueUF(T1.rules_id) AS nameRule, T1.agent_corporate_entity_id AS agentId, CONVERT(T2.notes USING utf8) AS notesJSON,
+     GetEnumValueUF(T3.salutation_id) AS salutation,
+     T3.name AS contactName,
+     T3.address_1 AS contactAddress1,
+     T3.address_2 AS contactAddress2,
+     T3.city AS contactCity,
+     T3.region AS contactRegion,
+     T3.country AS contactCountry,
+     T3.post_code AS contactMailCode,
+     T3.telephone AS contactPhone,
+     T3.fax AS contactFax,
+     T3.email AS contactEmail
 FROM
      name_corporate_entity T1
 INNER JOIN
@@ -61,8 +93,20 @@ WHERE
 	<field name="nameTable" class="java.lang.String"/>
 	<field name="agentIdColumn" class="java.lang.String"/>
 	<field name="nameSource" class="java.lang.String"/>
+	<field name="nameRule" class="java.lang.String"/>
 	<field name="agentId" class="java.lang.Integer"/>
 	<field name="notesJSON" class="java.lang.String"/>
+	<field name="salutation" class="java.lang.String"/>
+	<field name="contactName" class="java.lang.String"/>
+	<field name="contactAddress1" class="java.lang.String"/>
+	<field name="contactAddress2" class="java.lang.String"/>
+	<field name="contactCity" class="java.lang.String"/>
+	<field name="contactRegion" class="java.lang.String"/>
+	<field name="contactCountry" class="java.lang.String"/>
+	<field name="contactMailCode" class="java.lang.String"/>
+	<field name="contactPhone" class="java.lang.String"/>
+	<field name="contactFax" class="java.lang.String"/>
+	<field name="contactEmail" class="java.lang.String"/>
 	<variable name="descriptionType" class="java.lang.String"/>
 	<variable name="descriptionNote" class="java.lang.String"/>
 	<variable name="citation" class="java.lang.String"/>
@@ -433,6 +477,18 @@ WHERE
 			</textField>
 			<subreport isUsingCache="true" runToBottom="false">
 				<reportElement key="subreport-3" positionType="Float" isPrintRepeatedValues="false" mode="Transparent" x="11" y="94" width="511" height="12" isRemoveLineWhenBlank="true" forecolor="#000000" backcolor="#FFFFFF" uuid="42d12398-029e-4fae-936a-585ffb29d1c6"/>
+				<subreportParameter name="agentId">
+					<subreportParameterExpression><![CDATA[$F{agentId}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="nameTable">
+					<subreportParameterExpression><![CDATA[$F{nameTable}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="parentNameId">
+					<subreportParameterExpression><![CDATA[$F{parentNameId}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="agentIdColumn">
+					<subreportParameterExpression><![CDATA[$F{agentIdColumn}]]></subreportParameterExpression>
+				</subreportParameter>
 				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
 				<subreportExpression><![CDATA[$P{basePath} + "/sub_nonPreferredNames.jasper"]]></subreportExpression>
 			</subreport>
