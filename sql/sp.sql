@@ -485,6 +485,34 @@ END $$
 
 DELIMITER ; 
 
+-- Function to return the sortname given a Person, Family, Corporate, or Software
+-- when those ids found in the linked_agents_rlshp are passed in as parameters
+DROP FUNCTION IF EXISTS GetAgentSortName;
+
+DELIMITER $$
+
+CREATE FUNCTION GetAgentSortName(f_person_id INT, f_family_id INT, f_corporate_id INT, f_software_id INT) 
+	RETURNS VARCHAR(255)
+BEGIN
+	DECLARE f_value VARCHAR(255);	
+	
+	IF f_person_id IS NOT NULL THEN
+            SELECT sort_name INTO f_value FROM name_person WHERE id = f_person_id;
+        ELSEIF f_family_id IS NOT NULL THEN
+            SELECT sort_name INTO f_value FROM name_family WHERE id = f_family_id;
+        ELSEIF f_corporate_id IS NOT NULL THEN
+            SELECT sort_name INTO f_value FROM name_corporate_entity WHERE id = f_corporate_id;
+        ELSEIF f_software_id IS NOT NULL THEN
+            SELECT sort_name INTO f_value FROM name_software WHERE id = f_software_id;
+        ELSE 
+            SET f_value = 'Unknown';
+        END IF;
+
+	RETURN f_value;
+END $$
+
+DELIMITER ;
+
 -- Function to return the number of subject records
 DROP FUNCTION IF EXISTS GetTotalSubjects;
 
@@ -770,6 +798,53 @@ BEGIN
         ELSE
             SET f_value = f_expression;
         END IF;
+    
+	RETURN f_value;
+END $$
+
+DELIMITER ;
+
+-- Function to return the resource identifier for a given instance
+DROP FUNCTION IF EXISTS GetResourceIdentiferForInstance;
+
+DELIMITER $$
+
+CREATE FUNCTION GetResourceIdentiferForInstance(f_record_id INT) 
+	RETURNS VARCHAR(255)
+BEGIN
+	DECLARE f_value VARCHAR(255);
+        
+        -- get the resource id 
+	SELECT T2.`identifier` INTO f_value  
+	FROM 
+            instance T1
+        INNER JOIN
+            resource T2 ON GetResourceID(T1.`resource_id`, T1.`archival_object_id`) = T2.`id`
+	WHERE T1.`id` = f_record_id; 
+    
+	RETURN f_value;
+END $$
+
+DELIMITER ;
+
+
+-- Function to return the resource identifier for a given instance
+DROP FUNCTION IF EXISTS GetResourceTitleForInstance;
+
+DELIMITER $$
+
+CREATE FUNCTION GetResourceTitleForInstance(f_record_id INT) 
+	RETURNS VARCHAR(255)
+BEGIN
+	DECLARE f_value VARCHAR(255);
+        
+        -- get the resource id 
+	SELECT T2.`title` INTO f_value  
+	FROM 
+            instance T1
+        INNER JOIN
+            resource T2 ON GetResourceID(T1.`resource_id`, T1.`archival_object_id`) = T2.`id`
+	WHERE T1.`id` = f_record_id; 
     
 	RETURN f_value;
 END $$

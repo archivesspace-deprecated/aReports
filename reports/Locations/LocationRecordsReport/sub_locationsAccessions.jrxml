@@ -92,7 +92,7 @@ WHERE housed_at_rlshp.`location_id` = $P{LOCATION_ID}]]>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{accession_title}]]></textFieldExpression>
 			</textField>
-			<textField isBlankWhenNull="false">
+			<textField pattern="" isBlankWhenNull="false">
 				<reportElement key="textField" x="325" y="1" width="174" height="15" isPrintWhenDetailOverflows="true" uuid="8ee0ae48-a082-4a42-b37c-4f58c614a8ba"/>
 				<box>
 					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
