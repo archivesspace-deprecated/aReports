@@ -2,22 +2,46 @@
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="TestNotesReport" language="groovy" pageWidth="612" pageHeight="792" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="be855b46-573a-4311-bac3-a0656f4cfe21">
 	<property name="ireport.zoom" value="1.0"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="0"/>
+	<property name="ireport.y" value="16"/>
 	<scriptlet name="NotesScriptlet" class="areports.scriptlets.NotesScriptlet"/>
 	<parameter name="reportName" class="java.lang.String" isForPrompting="false">
 		<defaultValueExpression><![CDATA["NamesRecordReport"]]></defaultValueExpression>
 	</parameter>
 	<queryString>
-		<![CDATA[SELECT
-     note.`id` AS note_id,
-     CONVERT(notes USING utf8) AS notesJSON
+		<![CDATA[(SELECT
+     T1.id AS note_id,
+     CONVERT(T1.notes USING utf8) AS notesJSON,
+     T2.name AS contactName,
+     T2.address_1 AS contactAddress1,
+     T2.address_2 AS contactAddress2,
+     T2.city AS contactCity,
+     T2.region AS contactRegion,
+     T2.country AS contactCountry,
+     T2.post_code AS contactMailCode,
+     T2.telephone AS contactPhone,
+     T2.fax AS contactFax,
+     T2.email AS contactEmail
 FROM
-     `note` note
+     `note` T1
+INNER JOIN
+     agent_contact T2 ON T1.agent_person_id = T2.agent_person_id
 WHERE
-     agent_person_id IS NOT NULL OR agent_family_id IS NOT NULL OR agent_corporate_entity_id IS NOT NULL]]>
+     T1.agent_person_id IS NOT NULL
+)
+]]>
 	</queryString>
 	<field name="note_id" class="java.lang.Integer"/>
 	<field name="notesJSON" class="java.lang.String"/>
+	<field name="contactName" class="java.lang.String"/>
+	<field name="contactAddress1" class="java.lang.String"/>
+	<field name="contactAddress2" class="java.lang.String"/>
+	<field name="contactCity" class="java.lang.String"/>
+	<field name="contactRegion" class="java.lang.String"/>
+	<field name="contactCountry" class="java.lang.String"/>
+	<field name="contactMailCode" class="java.lang.String"/>
+	<field name="contactPhone" class="java.lang.String"/>
+	<field name="contactFax" class="java.lang.String"/>
+	<field name="contactEmail" class="java.lang.String"/>
 	<variable name="descriptionType" class="java.lang.String"/>
 	<variable name="descriptionNote" class="java.lang.String"/>
 	<variable name="citation" class="java.lang.String"/>

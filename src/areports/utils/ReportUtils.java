@@ -49,7 +49,7 @@ public class ReportUtils {
 
         // initialize the reports map if needed
         if (reportsMap == null) {
-            reportsMap = new TreeMap<>();
+            reportsMap = new TreeMap<String, Set<JasperReportInfo>>();
             reportsDir = dir.getAbsolutePath();
         }
 
@@ -65,7 +65,7 @@ public class ReportUtils {
                 String dirName = file.getAbsolutePath();
                 //System.out.println("\nDirectory: " + dirName + "\n");
 
-                TreeSet<JasperReportInfo> reportsSet = new TreeSet<>();
+                TreeSet<JasperReportInfo> reportsSet = new TreeSet<JasperReportInfo>();
                 String key = dirName.replace(reportsDir, "");
                 reportsMap.put(key, reportsSet);
 
@@ -182,7 +182,7 @@ public class ReportUtils {
 
                 System.out.println("Connected to: " + host);
                 return true;
-            } catch (JSchException | SftpException ex) {
+            } catch (Exception ex) {
                 Logger.getLogger(ReportUtils.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
@@ -263,7 +263,7 @@ public class ReportUtils {
                 sftpChannel.put(new FileInputStream(file), remoteFilename, ChannelSftp.OVERWRITE);
                 System.out.println("Copied Report File " + remoteFilename);
             }
-        } catch (SftpException | FileNotFoundException ex) {
+        } catch (Exception ex) {
             Logger.getLogger(ReportUtils.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
@@ -275,7 +275,7 @@ public class ReportUtils {
      * @return
      */
     public static ArrayList<File> getReportFiles(JasperReportInfo reportInfo) {
-        ArrayList<File> reportFiles = new ArrayList<>();
+        ArrayList<File> reportFiles = new ArrayList<File>();
 
         // get any sub reports
         File directory = new File(reportInfo.getParentDirectoryName());
