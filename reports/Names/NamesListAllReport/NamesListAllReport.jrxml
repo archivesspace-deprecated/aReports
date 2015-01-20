@@ -6,12 +6,14 @@
 	<property name="ireport.encoding" value="UTF-8"/>
 	<property name="ireport.zoom" value="1.0"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="111"/>
+	<property name="ireport.y" value="117"/>
 	<import value="net.sf.jasperreports.engine.*"/>
 	<import value="java.util.*"/>
 	<import value="net.sf.jasperreports.engine.data.*"/>
 	<parameter name="basePath" class="java.lang.String"/>
-	<parameter name="ReportHeader" class="java.lang.String" isForPrompting="false"/>
+	<parameter name="ReportHeader" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[""]]></defaultValueExpression>
+	</parameter>
 	<queryString>
 		<![CDATA[(SELECT id AS nameId, sort_name AS sortName, 'Person' AS nameType,  GetEnumValueUF(source_id) AS nameSource, agent_person_id AS agentId FROM name_person WHERE source_id IS NOT NULL AND (SELECT id FROM user WHERE agent_record_id = agent_person_id) IS NULL)
 UNION
