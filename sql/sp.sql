@@ -683,6 +683,31 @@ END $$
 
 DELIMITER ;
 
+-- Function to return the total extent of a resource record excluding the
+-- archival objects
+DROP FUNCTION IF EXISTS GetResourceExtent;
+
+DELIMITER $$
+
+CREATE FUNCTION GetResourceExtent(f_resource_id INT) 
+	RETURNS DECIMAL(10,2)
+BEGIN
+	DECLARE f_total DECIMAL(10,2);	
+	
+	SELECT SUM(T1.number) INTO f_total  
+	FROM extent T1 
+	WHERE T1.resource_id = f_resource_id;
+	
+	-- Check for null then set it to zero
+	IF f_total IS NULL THEN
+		SET f_total = 0;
+	END IF;
+	
+	RETURN f_total;
+END $$
+
+DELIMITER ;
+
 -- Function to return the number of subject records with a certain term type
 DROP FUNCTION IF EXISTS GetTermTypeCount;
 
