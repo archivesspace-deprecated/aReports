@@ -6,46 +6,39 @@
 	<property name="ireport.encoding" value="UTF-8"/>
 	<property name="ireport.zoom" value="1.0"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="91"/>
+	<property name="ireport.y" value="55"/>
 	<import value="net.sf.jasperreports.engine.*"/>
 	<import value="java.util.*"/>
 	<import value="net.sf.jasperreports.engine.data.*"/>
 	<parameter name="basePath" class="java.lang.String"/>
-	<parameter name="ReportHeader" class="java.lang.String" isForPrompting="false"/>
-	<field name="title" class="java.lang.String"/>
-	<field name="dateExpression" class="java.lang.String"/>
-	<field name="resourceIdentifier1" class="java.lang.String"/>
-	<field name="resourceIdentifier2" class="java.lang.String"/>
-	<field name="resourceIdentifier3" class="java.lang.String"/>
-	<field name="resourceIdentifier4" class="java.lang.String"/>
-	<field name="restrictionsApply" class="java.lang.Boolean"/>
-	<field name="extentNumber" class="java.lang.Double"/>
-	<field name="extentType" class="java.lang.String"/>
-	<field name="dateBegin" class="java.lang.Integer"/>
-	<field name="dateEnd" class="java.lang.Integer"/>
-	<field name="bulkDateBegin" class="java.lang.Integer"/>
-	<field name="bulkDateEnd" class="java.lang.Integer"/>
-	<field name="languageCode" class="java.lang.String"/>
-	<field name="level" class="java.lang.String"/>
-	<field name="containerSummary" class="java.lang.String"/>
-	<field name="namesForPrinting" class="java.util.Set"/>
+	<parameter name="ReportHeader" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[""]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT
+     resource.`id` AS resourceId,
+     resource.`repo_id` AS repo_id,
+     resource.`title` AS title,
+     resource.`identifier` AS resourceIdentifier,
+     GetEnumValueUF(resource.`level_id`) AS level,
+     GetResourceDateExpression(resource.`id`) AS dateExpression,
+     GetResourceHasCreator(resource.`id`) AS hasCreator
+FROM
+     `resource` resource]]>
+	</queryString>
+	<field name="resourceId" class="java.lang.Integer"/>
+	<field name="repo_id" class="java.lang.Integer">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="title" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
 	<field name="resourceIdentifier" class="java.lang.String"/>
-	<field name="displayCreator" class="java.lang.String"/>
-	<variable name="resourcesCreatorNamesDataSource" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource" resetType="Column">
-		<variableExpression><![CDATA[new JRBeanCollectionDataSource(new ArrayList($F{namesForPrinting}))]]></variableExpression>
-	</variable>
-	<variable name="HAS_CREATOR_TEST" class="java.lang.Integer" resetType="None" calculation="Sum">
-		<variableExpression><![CDATA[$F{displayCreator}.equals("") ? Integer.valueOf(0) : Integer.valueOf(1)]]></variableExpression>
-	</variable>
-	<variable name="SEPARATOR" class="java.lang.String">
-		<variableExpression><![CDATA[$F{resourceIdentifier2}]]></variableExpression>
-	</variable>
-	<variable name="SEPARATOR-2" class="java.lang.String">
-		<variableExpression><![CDATA[$F{resourceIdentifier3}]]></variableExpression>
-	</variable>
-	<variable name="SEPARATOR-3" class="java.lang.String">
-		<variableExpression><![CDATA[$F{resourceIdentifier4}]]></variableExpression>
-	</variable>
+	<field name="level" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="dateExpression" class="java.lang.String"/>
+	<field name="hasCreator" class="java.lang.Boolean"/>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
@@ -75,10 +68,13 @@
 	</columnHeader>
 	<detail>
 		<band height="96" splitType="Stretch">
-			<printWhenExpression><![CDATA[$V{HAS_CREATOR_TEST}.intValue()>0 ? Boolean.TRUE : Boolean.FALSE]]></printWhenExpression>
-			<subreport isUsingCache="true">
+			<printWhenExpression><![CDATA[$F{hasCreator}]]></printWhenExpression>
+			<subreport isUsingCache="false">
 				<reportElement key="subreport-1" positionType="Float" x="10" y="79" width="513" height="11" isRemoveLineWhenBlank="true" forecolor="#000000" backcolor="#FFFFFF" uuid="57532413-0513-488e-94d4-aa83fbae943d"/>
-				<dataSourceExpression><![CDATA[$V{resourcesCreatorNamesDataSource}]]></dataSourceExpression>
+				<subreportParameter name="resourceId">
+					<subreportParameterExpression><![CDATA[$F{resourceId}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
 				<subreportExpression><![CDATA[$P{basePath} + "/sub_resourcesNamesAsCreators.jasper"]]></subreportExpression>
 			</subreport>
 			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
@@ -93,7 +89,11 @@
 					<font fontName="Arial" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{resourceIdentifier}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{resourceIdentifier}.replace("[", "").
+replace("]","").
+replace("\"","").
+replace(",null", "").
+replace(",", ".")]]></textFieldExpression>
 			</textField>
 			<staticText>
 				<reportElement key="staticText-15" positionType="Float" x="385" y="42" width="92" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="fbfaec69-bd22-4301-8a60-b638d5070eae"/>
@@ -109,14 +109,12 @@
 				</textElement>
 				<text><![CDATA[Resource Level:]]></text>
 			</staticText>
-			<textField isStretchWithOverflow="true">
-				<reportElement positionType="Float" x="205" y="58" width="170" height="15" isRemoveLineWhenBlank="true" uuid="94c65690-aaf2-445b-b9b5-cda2c63c2e4e">
-					<printWhenExpression><![CDATA[$F{dateExpression}.equals("") ? Boolean.TRUE : Boolean.FALSE]]></printWhenExpression>
-				</reportElement>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement positionType="Float" x="205" y="58" width="170" height="15" isRemoveLineWhenBlank="true" uuid="94c65690-aaf2-445b-b9b5-cda2c63c2e4e"/>
 				<textElement>
 					<font fontName="Arial" size="10"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{dateBegin}!=null ? ($F{dateBegin}) + "-" + ("" +$F{dateEnd}) : ""]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{dateExpression}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
 				<reportElement key="textField-9" positionType="Float" x="385" y="58" width="138" height="15" isRemoveLineWhenBlank="true" forecolor="#000000" backcolor="#FFFFFF" uuid="bbe057f0-d5fb-42ae-a8c1-a5fcb9d5843a"/>
@@ -145,15 +143,6 @@
 					<paragraph lineSpacing="Single"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{title}.equals("") ? "[no title]" : $F{title}]]></textFieldExpression>
-			</textField>
-			<textField isStretchWithOverflow="true">
-				<reportElement positionType="Float" x="205" y="58" width="170" height="15" isRemoveLineWhenBlank="true" uuid="51134799-436b-43a1-ba47-4082bf239b1c">
-					<printWhenExpression><![CDATA[$F{dateExpression}.equals("") ? Boolean.FALSE : Boolean.TRUE]]></printWhenExpression>
-				</reportElement>
-				<textElement>
-					<font fontName="Arial" size="10"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{dateBegin}!=null ? $F{dateExpression} + " , " + ($F{dateBegin}) + "-" + ("" +$F{dateEnd}) : $F{dateExpression}]]></textFieldExpression>
 			</textField>
 			<staticText>
 				<reportElement key="staticText-14" positionType="Float" x="10" y="42" width="165" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="4fef448a-5e30-4bc1-8497-b24b39fdb7bb"/>

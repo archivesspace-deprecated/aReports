@@ -6,7 +6,7 @@
 	<property name="ireport.encoding" value="UTF-8"/>
 	<property name="ireport.zoom" value="1.0"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="148"/>
+	<property name="ireport.y" value="111"/>
 	<import value="net.sf.jasperreports.engine.*"/>
 	<import value="java.util.*"/>
 	<import value="net.sf.jasperreports.engine.data.*"/>
@@ -14,41 +14,37 @@
 	<parameter name="ReportHeader" class="java.lang.String" isForPrompting="false">
 		<defaultValueExpression><![CDATA[""]]></defaultValueExpression>
 	</parameter>
-	<field name="title" class="java.lang.String"/>
-	<field name="dateExpression" class="java.lang.String"/>
-	<field name="resourceIdentifier1" class="java.lang.String"/>
-	<field name="resourceIdentifier2" class="java.lang.String"/>
-	<field name="resourceIdentifier3" class="java.lang.String"/>
-	<field name="resourceIdentifier4" class="java.lang.String"/>
-	<field name="restrictionsApply" class="java.lang.Boolean"/>
-	<field name="extentNumber" class="java.lang.Double"/>
-	<field name="extentType" class="java.lang.String"/>
-	<field name="dateBegin" class="java.lang.Integer"/>
-	<field name="dateEnd" class="java.lang.Integer"/>
-	<field name="bulkDateBegin" class="java.lang.Integer"/>
-	<field name="bulkDateEnd" class="java.lang.Integer"/>
-	<field name="languageCode" class="java.lang.String"/>
-	<field name="level" class="java.lang.String"/>
-	<field name="containerSummary" class="java.lang.String"/>
-	<field name="namesForPrinting" class="java.util.Set"/>
+	<queryString>
+		<![CDATA[SELECT
+     resource.`id` AS resourceId,
+     resource.`repo_id` AS repo_id,
+     resource.`title` AS title,
+     resource.`identifier` AS resourceIdentifier,
+     GetEnumValueUF(resource.`language_id`) AS languageCode,
+     GetEnumValueUF(resource.`level_id`) AS level,
+     GetResourceDateExpression(resource.`id`) AS dateExpression,
+     GetResourceExtent(resource.`id`) AS extentNumber,
+     resource.`restrictions` AS restrictionsApply
+FROM
+     `resource` resource]]>
+	</queryString>
+	<field name="resourceId" class="java.lang.Integer"/>
+	<field name="repo_id" class="java.lang.Integer">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="title" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
 	<field name="resourceIdentifier" class="java.lang.String"/>
-	<variable name="SEPARATOR" class="java.lang.String">
-		<variableExpression><![CDATA[$F{resourceIdentifier2}]]></variableExpression>
-	</variable>
-	<variable name="SEPARATOR-2" class="java.lang.String">
-		<variableExpression><![CDATA[$F{resourceIdentifier3}]]></variableExpression>
-	</variable>
-	<variable name="SEPARATOR-3" class="java.lang.String">
-		<variableExpression><![CDATA[$F{resourceIdentifier4}]]></variableExpression>
-	</variable>
-	<variable name="TEST_RESTRICTIONS" class="java.lang.Boolean">
-		<variableExpression><![CDATA[$F{restrictionsApply}]]></variableExpression>
-	</variable>
-	<variable name="resourcesCreatorNamesDataSource" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource">
-		<variableExpression><![CDATA[new JRBeanCollectionDataSource(new ArrayList($F{namesForPrinting}))]]></variableExpression>
-	</variable>
+	<field name="languageCode" class="java.lang.String"/>
+	<field name="level" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="dateExpression" class="java.lang.String"/>
+	<field name="extentNumber" class="java.math.BigDecimal"/>
+	<field name="restrictionsApply" class="java.lang.Integer"/>
 	<variable name="TEST_RESTRICTIONS_COUNT" class="java.lang.Integer" calculation="Sum">
-		<variableExpression><![CDATA[(($V{TEST_RESTRICTIONS})+"").equals("true") ? Integer.valueOf(1) : Integer.valueOf(0)]]></variableExpression>
+		<variableExpression><![CDATA[$F{restrictionsApply}]]></variableExpression>
 	</variable>
 	<variable name="EXTENT_SUM" class="java.lang.Double" calculation="Sum">
 		<variableExpression><![CDATA[$F{extentNumber}]]></variableExpression>
@@ -148,17 +144,18 @@
 		<band height="95" splitType="Immediate">
 			<subreport isUsingCache="false">
 				<reportElement key="subreport-5" positionType="Float" mode="Transparent" x="10" y="75" width="514" height="12" isRemoveLineWhenBlank="true" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF" uuid="ab02240a-8cb7-4356-9fb7-6be5574adb35"/>
-				<dataSourceExpression><![CDATA[$V{resourcesCreatorNamesDataSource}]]></dataSourceExpression>
+				<subreportParameter name="resourceId">
+					<subreportParameterExpression><![CDATA[$F{resourceId}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
 				<subreportExpression><![CDATA[$P{basePath} + "/sub_resourcesNamesAsCreators.jasper"]]></subreportExpression>
 			</subreport>
 			<textField isStretchWithOverflow="true">
-				<reportElement positionType="Float" x="205" y="55" width="170" height="15" isRemoveLineWhenBlank="true" uuid="d0aca752-6f3b-404e-9562-2734c6b256fb">
-					<printWhenExpression><![CDATA[$F{dateExpression}.equals("") ? Boolean.FALSE : Boolean.TRUE]]></printWhenExpression>
-				</reportElement>
+				<reportElement positionType="Float" x="205" y="55" width="170" height="15" isRemoveLineWhenBlank="true" uuid="d0aca752-6f3b-404e-9562-2734c6b256fb"/>
 				<textElement>
 					<font fontName="Arial" size="10"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{dateBegin}!=null ? $F{dateExpression} + " , " + ($F{dateBegin}) + "-" + ("" +$F{dateEnd}) : $F{dateExpression}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{dateExpression}]]></textFieldExpression>
 			</textField>
 			<staticText>
 				<reportElement key="staticText-14" positionType="Float" mode="Opaque" x="10" y="39" width="165" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="e34d97b6-4a1c-4617-9b72-93c80b88fab6"/>
@@ -214,7 +211,11 @@
 					<font fontName="Arial" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{resourceIdentifier}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{resourceIdentifier}.replace("[", "").
+replace("]","").
+replace("\"","").
+replace(",null", "").
+replace(",", ".")]]></textFieldExpression>
 			</textField>
 			<line>
 				<reportElement positionType="Float" x="0" y="7" width="532" height="1" uuid="44f7ef30-3c2f-4573-b556-c0e0a4e7d437"/>
@@ -235,15 +236,6 @@
 					<paragraph lineSpacing="Single"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{title}.equals("") ? "[no title]" : $F{title}]]></textFieldExpression>
-			</textField>
-			<textField isStretchWithOverflow="true">
-				<reportElement positionType="Float" x="205" y="55" width="170" height="15" isRemoveLineWhenBlank="true" uuid="ef233ada-fb63-4413-9f1a-27f5fd0fae9f">
-					<printWhenExpression><![CDATA[$F{dateExpression}.equals("") ? Boolean.TRUE : Boolean.FALSE]]></printWhenExpression>
-				</reportElement>
-				<textElement>
-					<font fontName="Arial" size="10"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{dateBegin}!=null ? ($F{dateBegin}) + "-" + ("" +$F{dateEnd}) : ""]]></textFieldExpression>
 			</textField>
 			<staticText>
 				<reportElement key="staticText-13" positionType="Float" mode="Opaque" x="205" y="39" width="57" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="dcf73712-ac75-4013-a2fc-a778122ab646"/>

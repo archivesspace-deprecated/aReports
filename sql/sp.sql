@@ -491,7 +491,7 @@ DROP FUNCTION IF EXISTS GetAgentSortName;
 
 DELIMITER $$
 
-CREATE FUNCTION GetAgentSortName(f_person_id INT, f_family_id INT, f_corporate_id INT, f_software_id INT) 
+CREATE FUNCTION GetAgentSortName(f_person_id INT, f_family_id INT, f_corporate_id INT) 
 	RETURNS VARCHAR(255)
 BEGIN
 	DECLARE f_value VARCHAR(255);	
@@ -502,10 +502,41 @@ BEGIN
             SELECT sort_name INTO f_value FROM name_family WHERE id = f_family_id;
         ELSEIF f_corporate_id IS NOT NULL THEN
             SELECT sort_name INTO f_value FROM name_corporate_entity WHERE id = f_corporate_id;
-        ELSEIF f_software_id IS NOT NULL THEN
-            SELECT sort_name INTO f_value FROM name_software WHERE id = f_software_id;
         ELSE 
             SET f_value = 'Unknown';
+        END IF;
+
+	RETURN f_value;
+END $$
+
+DELIMITER ;
+
+-- Function to return if a resource record has any agents linked to it has
+-- Creators
+DROP FUNCTION IF EXISTS GetResourceHasCreator;
+
+DELIMITER $$
+
+CREATE FUNCTION GetResourceHasCreator(f_record_id INT) 
+	RETURNS INT
+BEGIN
+	DECLARE f_value INT;	
+        
+        SELECT
+            T1.`id` INTO f_value
+        FROM
+            `linked_agents_rlshp` T1
+        WHERE
+            GetResourceId(T1.`resource_id`, T1.`archival_object_id`) = f_record_id
+        AND
+            GetEnumValue(T1.`role_id`) = 'creator' COLLATE utf8_general_ci
+        LIMIT 1;
+
+	-- Check for null to set it to zero if needed
+	IF f_value IS NULL THEN
+            SET f_value = 0;
+	ELSE 
+            SET f_value = 1;
         END IF;
 
 	RETURN f_value;

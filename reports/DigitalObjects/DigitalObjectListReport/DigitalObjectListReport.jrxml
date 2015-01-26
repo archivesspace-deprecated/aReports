@@ -4,7 +4,7 @@
 	<property name="reportDescription" value="Displays digital object(s) in list fashion.  Report contains title, digital object identifier, object type dates and creator names."/>
 	<property name="ireport.zoom" value="1.0"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="101"/>
+	<property name="ireport.y" value="100"/>
 	<import value="net.sf.jasperreports.engine.*"/>
 	<import value="java.util.*"/>
 	<import value="net.sf.jasperreports.engine.data.*"/>
@@ -142,7 +142,11 @@ INNER JOIN
 				<textElement>
 					<font size="10"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{resourceIdentifier} + " -- " + $F{resourceTitle}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{resourceIdentifier}.replace("[", "").
+replace("]","").
+replace("\"","").
+replace(",null", "").
+replace(",", ".") + " -- " + $F{resourceTitle}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 				<reportElement positionType="Float" x="10" y="46" width="221" height="5" isRemoveLineWhenBlank="true" uuid="ecf77925-79f5-43db-b025-76d3533c527a"/>

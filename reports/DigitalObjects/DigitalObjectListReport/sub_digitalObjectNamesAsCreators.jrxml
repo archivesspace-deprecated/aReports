@@ -14,15 +14,17 @@
 	<queryString>
 		<![CDATA[SELECT
      T1.`id` AS linked_agents_rlshp_id,
-     GetAgentSortname(T1.`agent_person_id`, T1.`agent_family_id`, T1.`agent_corporate_entity_id`, T1.`digital_object_id`) AS sortName,
+     GetAgentSortname(T1.`agent_person_id`, T1.`agent_family_id`, T1.`agent_corporate_entity_id`) AS sortName,
      GetEnumValueUF(T1.`role_id`) AS nameLinkFunction,
      GetEnumValue(T1.`relator_id`) AS role
 FROM
      `linked_agents_rlshp` T1
 WHERE
      GetDigitalObjectId(T1.`digital_object_id`, T1.`digital_object_component_id`) = $P{digitalObjectId}
+     AND
+     GetEnumValueUF(T1.`role_id`) = 'Creator' COLLATE utf8_general_ci
 GROUP BY
-     GetAgentSortname(T1.`agent_person_id`, T1.`agent_family_id`, T1.`agent_corporate_entity_id`, T1.`digital_object_id`)]]>
+     GetAgentSortname(T1.`agent_person_id`, T1.`agent_family_id`, T1.`agent_corporate_entity_id`)]]>
 	</queryString>
 	<field name="linked_agents_rlshp_id" class="java.lang.Integer"/>
 	<field name="sortName" class="java.lang.String"/>
