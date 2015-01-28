@@ -544,6 +544,37 @@ END $$
 
 DELIMITER ;
 
+-- Function to return if a resource record has any agents linked to it has
+-- Creators
+DROP FUNCTION IF EXISTS GetResourceHasDeaccession;
+
+DELIMITER $$
+
+CREATE FUNCTION GetResourceHasDeaccession(f_record_id INT) 
+	RETURNS INT
+BEGIN
+	DECLARE f_value INT;	
+        
+        SELECT
+            T1.`id` INTO f_value
+        FROM
+            `deaccession` T1
+        WHERE
+            T1.`resource_id` = f_record_id
+        LIMIT 1;
+
+	-- Check for null to set it to zero if needed
+	IF f_value IS NULL THEN
+            SET f_value = 0;
+	ELSE 
+            SET f_value = 1;
+        END IF;
+
+	RETURN f_value;
+END $$
+
+DELIMITER ;
+
 -- Function to return the number of subject records
 DROP FUNCTION IF EXISTS GetTotalSubjects;
 
@@ -731,7 +762,37 @@ BEGIN
 	
 	-- Check for null then set it to zero
 	IF f_total IS NULL THEN
-		SET f_total = 0;
+            SET f_total = 0;
+	END IF;
+	
+	RETURN f_total;
+END $$
+
+DELIMITER ;
+
+-- Function to return the total extent of a resource record excluding the
+-- archival objects
+DROP FUNCTION IF EXISTS GetResourceDeaccessionExtent;
+
+DELIMITER $$
+
+CREATE FUNCTION GetResourceDeaccessionExtent(f_resource_id INT) 
+	RETURNS DECIMAL(10,2)
+BEGIN
+	DECLARE f_total DECIMAL(10,2);	
+	
+	SELECT SUM(T2.number) 
+            INTO f_total  
+	FROM 
+            deaccession T1
+        INNER JOIN 
+            extent T2 ON T1.id = T2.deaccession_id 
+	WHERE 
+            T1.resource_id = f_resource_id;
+	
+	-- Check for null then set it to zero
+	IF f_total IS NULL THEN
+            SET f_total = 0;
 	END IF;
 	
 	RETURN f_total;
@@ -773,6 +834,7 @@ CREATE FUNCTION GetAccessionDateExpression(f_record_id INT)
 	RETURNS VARCHAR(255)
 BEGIN
 	DECLARE f_value VARCHAR(255);
+        DECLARE f_date VARCHAR(255);
         DECLARE f_expression VARCHAR(255);
         DECLARE f_begin VARCHAR(255);
         DECLARE f_end VARCHAR(255);
@@ -785,8 +847,12 @@ BEGIN
         LIMIT 1;
 	
         -- If the expression is null return the concat of begin and end
+        SET f_date = CONCAT(f_begin, '-', f_end);
+        
         IF f_expression IS NULL THEN
-            SET f_value = CONCAT(f_begin, '-', f_end);
+            SET f_value = f_date;
+        ELSEIF f_date IS NOT NULL THEN
+            SET f_value = CONCAT(f_expression, ' , ', f_date);
         ELSE
             SET f_value = f_expression;
         END IF;
@@ -805,6 +871,7 @@ CREATE FUNCTION GetDigitalObjectDateExpression(f_record_id INT)
 	RETURNS VARCHAR(255)
 BEGIN
 	DECLARE f_value VARCHAR(255);
+        DECLARE f_date VARCHAR(255);
         DECLARE f_expression VARCHAR(255);
         DECLARE f_begin VARCHAR(255);
         DECLARE f_end VARCHAR(255);
@@ -817,8 +884,12 @@ BEGIN
         LIMIT 1;
 	
         -- If the expression is null return the concat of begin and end
+        SET f_date = CONCAT(f_begin, '-', f_end);
+        
         IF f_expression IS NULL THEN
-            SET f_value = CONCAT(f_begin, '-', f_end);
+            SET f_value = f_date;
+        ELSEIF f_date IS NOT NULL THEN
+            SET f_value = CONCAT(f_expression, ' , ', f_date);
         ELSE
             SET f_value = f_expression;
         END IF;
@@ -837,6 +908,7 @@ CREATE FUNCTION GetResourceDateExpression(f_record_id INT)
 	RETURNS VARCHAR(255)
 BEGIN
 	DECLARE f_value VARCHAR(255);
+        DECLARE f_date VARCHAR(255);
         DECLARE f_expression VARCHAR(255);
         DECLARE f_begin VARCHAR(255);
         DECLARE f_end VARCHAR(255);
@@ -849,11 +921,36 @@ BEGIN
         LIMIT 1;
 	
         -- If the expression is null return the concat of begin and end
+        SET f_date = CONCAT(f_begin, '-', f_end);
+        
         IF f_expression IS NULL THEN
-            SET f_value = CONCAT(f_begin, '-', f_end);
+            SET f_value = f_date;
+        ELSEIF f_date IS NOT NULL THEN
+            SET f_value = CONCAT(f_expression, ' , ', f_date);
         ELSE
             SET f_value = f_expression;
         END IF;
+    
+	RETURN f_value;
+END $$
+
+DELIMITER ;
+
+-- Function to return the resource id for a given instance
+DROP FUNCTION IF EXISTS GetResourceIdForInstance;
+
+DELIMITER $$
+
+CREATE FUNCTION GetResourceIdForInstance(f_record_id INT) 
+	RETURNS INT
+BEGIN
+	DECLARE f_value INT;
+        
+        -- get the resource id 
+	SELECT GetResourceID(T1.`resource_id`, T1.`archival_object_id`) INTO f_value  
+	FROM 
+            instance T1
+	WHERE T1.`id` = f_record_id; 
     
 	RETURN f_value;
 END $$

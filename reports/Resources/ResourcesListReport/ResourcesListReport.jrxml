@@ -6,7 +6,7 @@
 	<property name="ireport.encoding" value="UTF-8"/>
 	<property name="ireport.zoom" value="1.0"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="111"/>
+	<property name="ireport.y" value="112"/>
 	<import value="net.sf.jasperreports.engine.*"/>
 	<import value="java.util.*"/>
 	<import value="net.sf.jasperreports.engine.data.*"/>
@@ -20,11 +20,9 @@
      resource.`repo_id` AS repo_id,
      resource.`title` AS title,
      resource.`identifier` AS resourceIdentifier,
-     GetEnumValueUF(resource.`language_id`) AS languageCode,
      GetEnumValueUF(resource.`level_id`) AS level,
      GetResourceDateExpression(resource.`id`) AS dateExpression,
-     GetResourceExtent(resource.`id`) AS extentNumber,
-     resource.`restrictions` AS restrictionsApply
+     GetResourceExtent(resource.`id`) AS extentNumber
 FROM
      `resource` resource]]>
 	</queryString>
@@ -36,16 +34,11 @@ FROM
 		<fieldDescription><![CDATA[]]></fieldDescription>
 	</field>
 	<field name="resourceIdentifier" class="java.lang.String"/>
-	<field name="languageCode" class="java.lang.String"/>
 	<field name="level" class="java.lang.String">
 		<fieldDescription><![CDATA[]]></fieldDescription>
 	</field>
 	<field name="dateExpression" class="java.lang.String"/>
 	<field name="extentNumber" class="java.math.BigDecimal"/>
-	<field name="restrictionsApply" class="java.lang.Integer"/>
-	<variable name="TEST_RESTRICTIONS_COUNT" class="java.lang.Integer" calculation="Sum">
-		<variableExpression><![CDATA[$F{restrictionsApply}]]></variableExpression>
-	</variable>
 	<variable name="EXTENT_SUM" class="java.lang.Double" calculation="Sum">
 		<variableExpression><![CDATA[$F{extentNumber}]]></variableExpression>
 	</variable>
