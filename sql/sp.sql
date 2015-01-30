@@ -544,6 +544,64 @@ END $$
 
 DELIMITER ;
 
+-- Function to any agents sort_name linked to the resource has
+-- Creators
+DROP FUNCTION IF EXISTS GetResourceCreator;
+
+DELIMITER $$
+
+CREATE FUNCTION GetResourceCreator(f_record_id INT) 
+	RETURNS VARCHAR(1024)
+BEGIN
+	DECLARE f_value VARCHAR(1024);	
+        
+        SELECT
+            GROUP_CONCAT(GetAgentSortname(T1.`agent_person_id`, T1.`agent_family_id`, T1.`agent_corporate_entity_id`) SEPARATOR '; ') INTO f_value
+        FROM
+            `linked_agents_rlshp` T1
+        WHERE
+            GetResourceId(T1.`resource_id`, T1.`archival_object_id`) = f_record_id
+        AND
+            GetEnumValue(T1.`role_id`) = 'creator' COLLATE utf8_general_ci;
+
+	RETURN f_value;
+END $$
+
+DELIMITER ;
+
+-- Function to return if a resource record has any agents linked to it has
+-- Source
+DROP FUNCTION IF EXISTS GetResourceHasSource;
+
+DELIMITER $$
+
+CREATE FUNCTION GetResourceHasSource(f_record_id INT) 
+	RETURNS INT
+BEGIN
+	DECLARE f_value INT;	
+        
+        SELECT
+            T1.`id` INTO f_value
+        FROM
+            `linked_agents_rlshp` T1
+        WHERE
+            GetResourceId(T1.`resource_id`, T1.`archival_object_id`) = f_record_id
+        AND
+            GetEnumValue(T1.`role_id`) = 'source' COLLATE utf8_general_ci
+        LIMIT 1;
+
+	-- Check for null to set it to zero if needed
+	IF f_value IS NULL THEN
+            SET f_value = 0;
+	ELSE 
+            SET f_value = 1;
+        END IF;
+
+	RETURN f_value;
+END $$
+
+DELIMITER ;
+
 -- Function to return if a resource record has any agents linked to it has
 -- Creators
 DROP FUNCTION IF EXISTS GetResourceHasDeaccession;
@@ -766,6 +824,48 @@ BEGIN
 	END IF;
 	
 	RETURN f_total;
+END $$
+
+DELIMITER ;
+
+-- Function to return the resource extent type of a resource record excluding the
+-- archival objects
+DROP FUNCTION IF EXISTS GetResourceExtentType;
+
+DELIMITER $$
+
+CREATE FUNCTION GetResourceExtentType(f_resource_id INT) 
+	RETURNS VARCHAR(255)
+BEGIN
+	DECLARE f_value VARCHAR(255);	
+	
+	SELECT GetEnumValueUF(T1.extent_type_id) INTO f_value  
+	FROM extent T1 
+	WHERE T1.resource_id = f_resource_id
+        LIMIT 1;
+	
+	RETURN f_value;
+END $$
+
+DELIMITER ;
+
+-- Function to return the resource extent type of a resource record excluding the
+-- archival objects
+DROP FUNCTION IF EXISTS GetResourceContainerSummary;
+
+DELIMITER $$
+
+CREATE FUNCTION GetResourceContainerSummary(f_resource_id INT) 
+	RETURNS TEXT
+BEGIN
+	DECLARE f_value TEXT;	
+	
+	SELECT T1.container_summary INTO f_value  
+	FROM extent T1 
+	WHERE T1.resource_id = f_resource_id
+        LIMIT 1;
+	
+	RETURN f_value;
 END $$
 
 DELIMITER ;
