@@ -6,7 +6,7 @@
 	<property name="ireport.encoding" value="UTF-8"/>
 	<property name="ireport.zoom" value="1.0"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="184"/>
+	<property name="ireport.y" value="168"/>
 	<import value="net.sf.jasperreports.engine.*"/>
 	<import value="java.util.*"/>
 	<import value="net.sf.jasperreports.engine.data.*"/>
@@ -48,31 +48,7 @@ FROM
 	<field name="extentNumber" class="java.math.BigDecimal"/>
 	<field name="extentType" class="java.lang.String"/>
 	<field name="containerSummary" class="java.lang.String"/>
-	<field name="restrictionsApply" class="java.lang.Integer"/>
-	<variable name="SEPARATOR" class="java.lang.String">
-		<variableExpression><![CDATA[$F{resourceIdentifier2}]]></variableExpression>
-	</variable>
-	<variable name="SEPARATOR-2" class="java.lang.String">
-		<variableExpression><![CDATA[$F{resourceIdentifier3}]]></variableExpression>
-	</variable>
-	<variable name="SEPARATOR-3" class="java.lang.String">
-		<variableExpression><![CDATA[$F{resourceIdentifier4}]]></variableExpression>
-	</variable>
-	<variable name="TEST_RESTRICTIONS" class="java.lang.Boolean">
-		<variableExpression><![CDATA[$F{restrictionsApply}]]></variableExpression>
-	</variable>
-	<variable name="namesDataSource" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource">
-		<variableExpression><![CDATA[new JRBeanCollectionDataSource(new ArrayList($F{namesForPrinting}))]]></variableExpression>
-	</variable>
-	<variable name="subjectsDataSource" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource">
-		<variableExpression><![CDATA[new JRBeanCollectionDataSource(new ArrayList($F{subjectsForPrinting}))]]></variableExpression>
-	</variable>
-	<variable name="repeatingDataDataSource" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource">
-		<variableExpression><![CDATA[new JRBeanCollectionDataSource(new ArrayList($F{repeatingData}))]]></variableExpression>
-	</variable>
-	<variable name="digitalObjectDataSource" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource">
-		<variableExpression><![CDATA[new JRBeanCollectionDataSource(new ArrayList($F{digitalObjects}))]]></variableExpression>
-	</variable>
+	<field name="restrictionsApply" class="java.lang.Boolean"/>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
@@ -170,7 +146,7 @@ FROM
 					<font fontName="Arial" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
-				<textFieldExpression><![CDATA[(($V{TEST_RESTRICTIONS})+"").equals("true") ? "Restrictions apply." :"Open to researchers without restrictions."]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{restrictionsApply} ? "Restrictions apply." :"Open to researchers without restrictions."]]></textFieldExpression>
 			</textField>
 			<textField pattern="" isBlankWhenNull="true">
 				<reportElement key="textField-4" positionType="Float" isPrintRepeatedValues="false" mode="Transparent" x="205" y="106" width="57" height="15" isRemoveLineWhenBlank="true" forecolor="#000000" backcolor="#FFFFFF" uuid="4ab21cef-f62f-4f9d-9684-0aa6dcaa920f"/>
@@ -202,7 +178,10 @@ FROM
 			</textField>
 			<subreport isUsingCache="true">
 				<reportElement key="subreport-1" positionType="Float" mode="Transparent" x="10" y="171" width="514" height="3" isRemoveLineWhenBlank="true" forecolor="#000000" backcolor="#FFFFFF" uuid="8263a0a8-1d5c-453b-bc32-879a3364c9c3"/>
-				<dataSourceExpression><![CDATA[$V{repeatingDataDataSource}]]></dataSourceExpression>
+				<subreportParameter name="resourceId">
+					<subreportParameterExpression><![CDATA[$F{resourceId}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
 				<subreportExpression><![CDATA[$P{basePath} + "/sub_resourcesRepeatingData.jasper"]]></subreportExpression>
 			</subreport>
 			<textField pattern="" isBlankWhenNull="true">
@@ -265,12 +244,18 @@ FROM
 			</staticText>
 			<subreport isUsingCache="true">
 				<reportElement key="subreport-2" positionType="Float" mode="Transparent" x="10" y="175" width="514" height="3" isRemoveLineWhenBlank="true" forecolor="#000000" backcolor="#FFFFFF" uuid="56898926-df2e-4b9e-968c-70f08ccaae50"/>
-				<dataSourceExpression><![CDATA[$V{namesDataSource}]]></dataSourceExpression>
+				<subreportParameter name="resourceId">
+					<subreportParameterExpression><![CDATA[$F{resourceId}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
 				<subreportExpression><![CDATA[$P{basePath} + "/sub_resourcesNames.jasper"]]></subreportExpression>
 			</subreport>
 			<subreport isUsingCache="true">
 				<reportElement key="subreport-3" positionType="Float" mode="Transparent" x="10" y="179" width="514" height="3" isRemoveLineWhenBlank="true" forecolor="#000000" backcolor="#FFFFFF" uuid="461e5ee4-a0b8-489b-8f34-b644ca998c10"/>
-				<dataSourceExpression><![CDATA[$V{subjectsDataSource}]]></dataSourceExpression>
+				<subreportParameter name="resourceId">
+					<subreportParameterExpression><![CDATA[$F{resourceId}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
 				<subreportExpression><![CDATA[$P{basePath} + "/sub_resourcesSubjects.jasper"]]></subreportExpression>
 			</subreport>
 			<textField isStretchWithOverflow="true" evaluationTime="Band" pattern="" isBlankWhenNull="false">
@@ -377,7 +362,10 @@ replace(",", ".")]]></textFieldExpression>
 			</textField>
 			<subreport>
 				<reportElement positionType="Float" x="10" y="183" width="514" height="3" isRemoveLineWhenBlank="true" uuid="8d27ac2f-3951-4fc5-83e3-7b7a9010fa20"/>
-				<dataSourceExpression><![CDATA[$V{digitalObjectDataSource}]]></dataSourceExpression>
+				<subreportParameter name="resourceId">
+					<subreportParameterExpression><![CDATA[$F{resourceId}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
 				<subreportExpression><![CDATA[$P{basePath} + "/sub_resourcesDigitalObjects.jasper"]]></subreportExpression>
 			</subreport>
 			<textField isStretchWithOverflow="true">

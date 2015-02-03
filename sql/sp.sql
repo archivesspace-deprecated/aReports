@@ -1080,6 +1080,29 @@ END $$
 
 DELIMITER ;
 
+-- Function to return the resource id (PK) for a given instance
+DROP FUNCTION IF EXISTS GetResourceIdForInstance;
+
+DELIMITER $$
+
+CREATE FUNCTION GetResourceIdForInstance(f_record_id INT) 
+	RETURNS INT
+BEGIN
+	DECLARE f_value INT;
+        
+        -- get the resource id 
+	SELECT T2.`id` INTO f_value  
+	FROM 
+            instance T1
+        INNER JOIN
+            resource T2 ON GetResourceID(T1.`resource_id`, T1.`archival_object_id`) = T2.`id`
+	WHERE T1.`id` = f_record_id; 
+    
+	RETURN f_value;
+END $$
+
+DELIMITER ;
+
 
 -- Function to return the resource identifier for a given instance
 DROP FUNCTION IF EXISTS GetResourceTitleForInstance;
