@@ -279,6 +279,32 @@ END $$
 
 DELIMITER ;
 
+-- Function to return the number of accessions that are processed for
+-- a particular repository
+DROP FUNCTION IF EXISTS GetAccessionProcessedDate;
+
+DELIMITER $$
+
+CREATE FUNCTION GetAccessionProcessedDate(f_accession_id INT) 
+	RETURNS VARCHAR(255)
+BEGIN
+	DECLARE f_value VARCHAR(255);	
+	
+	SELECT GetEventDateExpression(T1.event_id) INTO f_value  
+	FROM 
+            event_link_rlshp T1 
+	INNER JOIN 
+            event T2 ON T1.event_id = T2.id 
+	WHERE 
+            (T1.accession_id = f_accession_id  
+	AND 
+            GetEnumValue(T2.event_type_id) = 'processed' COLLATE utf8_general_ci);
+	    
+	RETURN f_value;
+END $$
+
+DELIMITER ;
+
 -- Function to return the number of accessions that are cataloged for
 -- a particular repository
 DROP FUNCTION IF EXISTS GetAccessionsCataloged;
@@ -312,22 +338,30 @@ DELIMITER $$
 CREATE FUNCTION GetAccessionCataloged(f_accession_id INT) 
 	RETURNS INT
 BEGIN
-	DECLARE f_total INT DEFAULT 0;	
+	DECLARE f_value INT;	
 	
-	SELECT COUNT(T1.id) INTO f_total 
-	FROM event T1 
+	SELECT T1.id INTO f_value 
+	FROM 
+            event T1 
 	INNER JOIN 
-		event_link_rlshp T2 ON T1.id = T2.event_id 
+            event_link_rlshp T2 ON T1.id = T2.event_id 
 	WHERE (
-		T2.accession_id = f_accession_id 
+            T2.accession_id = f_accession_id 
 	AND 
-		GetEnumValue(T1.event_type_id) = 'cataloged' COLLATE utf8_general_ci);
-	    
-	RETURN f_total;
+            GetEnumValue(T1.event_type_id) = 'cataloged' COLLATE utf8_general_ci)
+        LIMIT 1;
+	
+        -- Check for null to set it to zero if needed
+	IF f_value IS NULL THEN
+            SET f_value = 0;
+	ELSE 
+            SET f_value = 1;
+        END IF;
+    
+	RETURN f_value;
 END $$
 
 DELIMITER ;
-
 
 -- Function to return the number of accessions with restrictions for a 
 -- particular repository
@@ -353,11 +387,11 @@ DELIMITER ;
 
 -- Function to return the number of accessions that have had rights transferred
 -- for a particular repository
-DROP FUNCTION IF EXISTS GetAccessionsWithRightsTransfered;
+DROP FUNCTION IF EXISTS GetAccessionsWithRightsTransferred;
 
 DELIMITER $$
 
-CREATE FUNCTION GetAccessionsWithRightsTransfered(f_repo_id INT) 
+CREATE FUNCTION GetAccessionsWithRightsTransferred(f_repo_id INT) 
 	RETURNS INT
 BEGIN
 	DECLARE f_total INT;	
@@ -372,6 +406,100 @@ BEGIN
 	GROUP BY T2.accession_id;
 	    
 	RETURN f_total;
+END $$
+
+DELIMITER ;
+
+-- Function to return if an accession has had it's rights transferred
+DROP FUNCTION IF EXISTS GetAccessionRightsTransferred;
+
+DELIMITER $$
+
+CREATE FUNCTION GetAccessionRightsTransferred(f_accession_id INT) 
+	RETURNS INT
+BEGIN
+	DECLARE f_value INT;	
+	
+	SELECT T1.id INTO f_value  
+	FROM 
+            event T1 
+	INNER JOIN 
+            event_link_rlshp T2 ON T1.id = T2.event_id 
+	WHERE 
+            T2.accession_id = f_accession_id 
+	AND 
+            GetEnumValue(T1.event_type_id) = 'rights_transferred' COLLATE utf8_general_ci;
+	    
+	-- Check for null to set it to zero if needed
+	IF f_value IS NULL THEN
+            SET f_value = 0;
+	ELSE 
+            SET f_value = 1;
+        END IF;
+
+	RETURN f_value;
+END $$
+
+DELIMITER ;
+
+-- Function to return if an accession has had it's rights transferred
+DROP FUNCTION IF EXISTS GetAccessionRightsTransferredNote;
+
+DELIMITER $$
+
+CREATE FUNCTION GetAccessionRightsTransferredNote(f_accession_id INT) 
+	RETURNS VARCHAR(255)
+BEGIN
+	DECLARE f_value VARCHAR(255);	
+	
+	SELECT T1.outcome_note INTO f_value  
+	FROM 
+            event T1 
+	INNER JOIN 
+            event_link_rlshp T2 ON T1.id = T2.event_id 
+	WHERE 
+            T2.accession_id = f_accession_id 
+	AND 
+            GetEnumValue(T1.event_type_id) = 'rights_transferred' COLLATE utf8_general_ci;
+
+	RETURN f_value;
+END $$
+
+DELIMITER ;
+
+-- Function to return the date expression for an accession record
+DROP FUNCTION IF EXISTS GetEventDateExpression;
+
+DELIMITER $$
+
+CREATE FUNCTION GetEventDateExpression(f_record_id INT) 
+	RETURNS VARCHAR(255)
+BEGIN
+	DECLARE f_value VARCHAR(255);
+        DECLARE f_date VARCHAR(255);
+        DECLARE f_expression VARCHAR(255);
+        DECLARE f_begin VARCHAR(255);
+        DECLARE f_end VARCHAR(255);
+	
+	SELECT date.`expression`, date.`begin`, date.`end` 
+        INTO f_expression, f_begin, f_end 
+	FROM 
+            date 
+	WHERE date.`event_id` = f_record_id 
+        LIMIT 1;
+	
+        -- If the expression is null return the concat of begin and end
+        SET f_date = CONCAT(f_begin, '-', f_end);
+        
+        IF f_expression IS NULL THEN
+            SET f_value = f_date;
+        ELSEIF f_date IS NOT NULL THEN
+            SET f_value = CONCAT(f_expression, ' , ', f_date);
+        ELSE
+            SET f_value = f_expression;
+        END IF;
+    
+	RETURN f_value;
 END $$
 
 DELIMITER ;
@@ -771,6 +899,53 @@ BEGIN
 	END IF;
 	
 	RETURN f_total;
+END $$
+
+DELIMITER ;
+
+-- Function to return the total extent for an accession record
+DROP FUNCTION IF EXISTS GetAccessionExtent;
+
+DELIMITER $$
+
+CREATE FUNCTION GetAccessionExtent(f_accession_id INT) 
+	RETURNS DECIMAL(10,2)
+BEGIN
+	DECLARE f_total DECIMAL(10,2);	
+	
+	SELECT SUM(T1.number) INTO f_total  
+	FROM extent T1 
+	INNER JOIN 
+            accession T2 ON T1.accession_id = T2.id 
+	WHERE 
+            T2.id = f_accession_id;
+	
+	-- Check for null then set it to zero
+	IF f_total IS NULL THEN
+		SET f_total = 0;
+	END IF;
+	
+	RETURN f_total;
+END $$
+
+DELIMITER ;
+
+-- Function to return the accession extent type
+DROP FUNCTION IF EXISTS GetAccessionExtentType;
+
+DELIMITER $$
+
+CREATE FUNCTION GetAccessionExtentType(f_accession_id INT) 
+	RETURNS VARCHAR(255)
+BEGIN
+	DECLARE f_value VARCHAR(255);	
+	
+	SELECT GetEnumValueUF(T1.extent_type_id) INTO f_value  
+	FROM extent T1 
+	WHERE T1.accession_id = f_accession_id
+        LIMIT 1;
+	
+	RETURN f_value;
 END $$
 
 DELIMITER ;

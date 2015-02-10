@@ -4,7 +4,7 @@
 	<property name="ireport.encoding" value="UTF-8"/>
 	<property name="ireport.zoom" value="1.0"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="533"/>
+	<property name="ireport.y" value="212"/>
 	<import value="net.sf.jasperreports.engine.*"/>
 	<import value="java.util.*"/>
 	<import value="net.sf.jasperreports.engine.data.*"/>
@@ -26,7 +26,7 @@
      GetAccessionsCataloged($P{repositoryId}) AS accessionsCataloged,
      GetAccessionsProcessed($P{repositoryId}) AS accessionsProcessed,
      GetAccessionsWithRestrictions($P{repositoryId}) AS accessionsWithRestrictions,
-     GetAccessionsWithRightsTransfered($P{repositoryId}) AS accessionsWithRightsTransfered,
+     GetAccessionsWithRightsTransferred($P{repositoryId}) AS accessionsWithRightsTransferred,
      GetAgentsPersonal($P{repositoryId}) AS agentsPersonal,
      GetAgentsCorporate($P{repositoryId}) AS agentsCorporate,
      GetAgentsFamily($P{repositoryId}) AS agentsFamily,
@@ -45,7 +45,7 @@ WHERE repository.`id` = $P{repositoryId}]]>
 	<field name="accessionsCataloged" class="java.lang.Integer"/>
 	<field name="accessionsProcessed" class="java.lang.Integer"/>
 	<field name="accessionsWithRestrictions" class="java.lang.Integer"/>
-	<field name="accessionsWithRightsTransfered" class="java.lang.Integer"/>
+	<field name="accessionsWithRightsTransferred" class="java.lang.Integer"/>
 	<field name="agentsPersonal" class="java.lang.Integer"/>
 	<field name="agentsCorporate" class="java.lang.Integer"/>
 	<field name="agentsFamily" class="java.lang.Integer"/>
@@ -69,8 +69,8 @@ WHERE repository.`id` = $P{repositoryId}]]>
 	<variable name="accesssionsUncataloged" class="java.lang.Integer">
 		<variableExpression><![CDATA[new java.lang.Integer(  ($F{totalAccessions}.intValue()) -($F{accessionsCataloged}.intValue()) )]]></variableExpression>
 	</variable>
-	<variable name="accesssionsWithoutRightTransfered" class="java.lang.Integer">
-		<variableExpression><![CDATA[new java.lang.Integer(  ($F{totalAccessions}.intValue()) -($F{accessionsWithRightsTransfered}.intValue()) )]]></variableExpression>
+	<variable name="accesssionsWithoutRightTransferred" class="java.lang.Integer">
+		<variableExpression><![CDATA[new java.lang.Integer(  ($F{totalAccessions}.intValue()) -($F{accessionsWithRightsTransferred}.intValue()) )]]></variableExpression>
 	</variable>
 	<variable name="PrintDate" class="java.util.Date" calculation="System">
 		<initialValueExpression><![CDATA[new java.util.Date()]]></initialValueExpression>
@@ -550,7 +550,7 @@ WHERE repository.`id` = $P{repositoryId}]]>
 					<textElement textAlignment="Right">
 						<font fontName="Arial" size="10"/>
 					</textElement>
-					<textFieldExpression><![CDATA[$F{accessionsWithRightsTransfered}]]></textFieldExpression>
+					<textFieldExpression><![CDATA[$F{accessionsWithRightsTransferred}]]></textFieldExpression>
 				</textField>
 				<staticText>
 					<reportElement key="staticText-19" positionType="Float" x="19" y="105" width="151" height="15" uuid="848d1adb-8134-4626-aace-2f1b04707e81"/>
@@ -576,7 +576,7 @@ WHERE repository.`id` = $P{repositoryId}]]>
 					<textElement textAlignment="Right">
 						<font fontName="Arial" size="10"/>
 					</textElement>
-					<textFieldExpression><![CDATA[$V{accesssionsWithoutRightTransfered}]]></textFieldExpression>
+					<textFieldExpression><![CDATA[$V{accesssionsWithoutRightTransferred}]]></textFieldExpression>
 				</textField>
 				<staticText>
 					<reportElement key="staticText-20" positionType="Float" x="19" y="124" width="167" height="15" uuid="d3c2c5e2-0c30-4c86-921e-1657b5aaa4e2"/>
