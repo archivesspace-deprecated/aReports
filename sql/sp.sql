@@ -268,13 +268,45 @@ BEGIN
 	DECLARE f_total INT;	
 	
 	SELECT count(T1.id) INTO f_total  
-	FROM accession T1 
+	FROM 
+            event_link_rlshp T1
 	INNER JOIN 
-		collection_management T2 ON T1.id = T2.accession_id 
-	WHERE (T1.repo_id = f_repo_id  
-	AND GetEnumValue(T2.processing_status_id) = 'completed' COLLATE utf8_general_ci);
+            event T2 ON T1.event_id = T2.id 
+	WHERE (
+            T2.repo_id = f_repo_id
+        AND
+            T1.accession_id IS NOT NULL
+	AND 
+            GetEnumValue(T2.event_type_id) = 'processed' COLLATE utf8_general_ci)
+        GROUP BY 
+            T1.accession_id;
 	    
 	RETURN f_total;
+END $$
+
+DELIMITER ;
+
+-- Function to return if an accessions has been processed
+DROP FUNCTION IF EXISTS GetAccessionProcessed;
+
+DELIMITER $$
+
+CREATE FUNCTION GetAccessionProcessed(f_accession_id INT) 
+	RETURNS VARCHAR(255)
+BEGIN
+	DECLARE f_value VARCHAR(255);	
+	
+	SELECT T1.event_id INTO f_value  
+	FROM 
+            event_link_rlshp T1 
+	INNER JOIN 
+            event T2 ON T1.event_id = T2.id 
+	WHERE 
+            (T1.accession_id = f_accession_id  
+	AND 
+            GetEnumValue(T2.event_type_id) = 'processed' COLLATE utf8_general_ci);
+	    
+	RETURN GetBoolean(f_value);
 END $$
 
 DELIMITER ;
@@ -317,13 +349,18 @@ BEGIN
 	DECLARE f_total INT;	
 	
 	SELECT count(T2.accession_id) INTO f_total  
-	FROM event T1 
+	FROM 
+            event T1 
 	INNER JOIN 
-		event_link_rlshp T2 ON T1.id = T2.event_id 
-	WHERE (T1.repo_id = f_repo_id  
-	AND T2.accession_id IS NOT NULL 
-	AND GetEnumValue(T1.event_type_id) = 'cataloged' COLLATE utf8_general_ci)
-	GROUP BY T2.accession_id;
+            event_link_rlshp T2 ON T1.id = T2.event_id 
+	WHERE (
+            T1.repo_id = f_repo_id  
+	AND 
+            T2.accession_id IS NOT NULL 
+	AND 
+            GetEnumValue(T1.event_type_id) = 'cataloged' COLLATE utf8_general_ci)
+	GROUP BY 
+            T2.accession_id;
 	    
 	RETURN f_total;
 END $$
@@ -350,15 +387,8 @@ BEGIN
 	AND 
             GetEnumValue(T1.event_type_id) = 'cataloged' COLLATE utf8_general_ci)
         LIMIT 1;
-	
-        -- Check for null to set it to zero if needed
-	IF f_value IS NULL THEN
-            SET f_value = 0;
-	ELSE 
-            SET f_value = 1;
-        END IF;
-    
-	RETURN f_value;
+
+	RETURN GetBoolean(f_value);
 END $$
 
 DELIMITER ;
@@ -430,14 +460,7 @@ BEGIN
 	AND 
             GetEnumValue(T1.event_type_id) = 'rights_transferred' COLLATE utf8_general_ci;
 	    
-	-- Check for null to set it to zero if needed
-	IF f_value IS NULL THEN
-            SET f_value = 0;
-	ELSE 
-            SET f_value = 1;
-        END IF;
-
-	RETURN f_value;
+	RETURN GetBoolean(f_value);
 END $$
 
 DELIMITER ;
@@ -660,14 +683,7 @@ BEGIN
             GetEnumValue(T1.`role_id`) = 'creator' COLLATE utf8_general_ci
         LIMIT 1;
 
-	-- Check for null to set it to zero if needed
-	IF f_value IS NULL THEN
-            SET f_value = 0;
-	ELSE 
-            SET f_value = 1;
-        END IF;
-
-	RETURN f_value;
+	RETURN GetBoolean(f_value);
 END $$
 
 DELIMITER ;
@@ -718,14 +734,7 @@ BEGIN
             GetEnumValue(T1.`role_id`) = 'source' COLLATE utf8_general_ci
         LIMIT 1;
 
-	-- Check for null to set it to zero if needed
-	IF f_value IS NULL THEN
-            SET f_value = 0;
-	ELSE 
-            SET f_value = 1;
-        END IF;
-
-	RETURN f_value;
+	RETURN GetBoolean(f_value);
 END $$
 
 DELIMITER ;
@@ -749,14 +758,7 @@ BEGIN
             T1.`resource_id` = f_record_id
         LIMIT 1;
 
-	-- Check for null to set it to zero if needed
-	IF f_value IS NULL THEN
-            SET f_value = 0;
-	ELSE 
-            SET f_value = 1;
-        END IF;
-
-	RETURN f_value;
+	RETURN GetBoolean(f_value);
 END $$
 
 DELIMITER ;
@@ -914,7 +916,8 @@ BEGIN
 	DECLARE f_total DECIMAL(10,2);	
 	
 	SELECT SUM(T1.number) INTO f_total  
-	FROM extent T1 
+	FROM 
+            extent T1 
 	INNER JOIN 
             accession T2 ON T1.accession_id = T2.id 
 	WHERE 
@@ -922,7 +925,7 @@ BEGIN
 	
 	-- Check for null then set it to zero
 	IF f_total IS NULL THEN
-		SET f_total = 0;
+            SET f_total = 0;
 	END IF;
 	
 	RETURN f_total;
@@ -941,10 +944,53 @@ BEGIN
 	DECLARE f_value VARCHAR(255);	
 	
 	SELECT GetEnumValueUF(T1.extent_type_id) INTO f_value  
+	FROM 
+            extent T1 
+	WHERE 
+            T1.accession_id = f_accession_id
+        LIMIT 1;
+	
+	RETURN f_value;
+END $$
+
+DELIMITER ;
+
+-- Function to return the accession extent type
+DROP FUNCTION IF EXISTS GetAccessionContainerSummary;
+
+DELIMITER $$
+
+CREATE FUNCTION GetAccessionContainerSummary(f_accession_id INT) 
+	RETURNS TEXT
+BEGIN
+	DECLARE f_value TEXT;	
+	
+	SELECT T1.container_summary INTO f_value  
 	FROM extent T1 
 	WHERE T1.accession_id = f_accession_id
         LIMIT 1;
 	
+	RETURN f_value;
+END $$
+
+DELIMITER ;
+
+-- Function to return the accession id for a given instance
+DROP FUNCTION IF EXISTS GetAccessionIdForInstance;
+
+DELIMITER $$
+
+CREATE FUNCTION GetAccessionIdForInstance(f_record_id INT) 
+	RETURNS INT
+BEGIN
+	DECLARE f_value INT;
+        
+        -- get the resource id 
+	SELECT T1.`accession_id` INTO f_value  
+	FROM 
+            instance T1
+	WHERE T1.`id` = f_record_id; 
+    
 	RETURN f_value;
 END $$
 
@@ -1298,6 +1344,28 @@ BEGIN
 	WHERE T1.`id` = f_record_id; 
     
 	RETURN f_value;
+END $$
+
+DELIMITER ;
+
+-- function to return a 0 or 1 to represent a boolean value to the report
+-- Function to return the resource id for a given instance
+DROP FUNCTION IF EXISTS GetBoolean;
+
+DELIMITER $$
+
+CREATE FUNCTION GetBoolean(f_value INT) 
+    RETURNS INT
+BEGIN
+    DECLARE f_boolean INT;
+        
+    IF f_value IS NULL THEN
+        SET f_boolean = 0;
+    ELSE 
+        SET f_boolean = 1;
+    END IF;
+
+    RETURN f_boolean;
 END $$
 
 DELIMITER ;
