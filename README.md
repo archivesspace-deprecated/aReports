@@ -25,3 +25,7 @@ The program also has the ability to generate the needed configuration files and 
 1. On Windows 7/8 there is a bug in Java which prevents program information from being stored. Follow the instructions at http://stackoverflow.com/questions/16428098/groovy-shell-warning-could-not-open-create-prefs-root-node
 2. Given the reports have a dependency on stored functions, only the MySQL backend is supported at this time.
 3. By default, the JDBC connection information for a tracer database is provided for testing purposes.
+4. For MySQL you may need to set the `thread_stack` value to 256k in `my.cnf` (requires restart).
+5. On Ubuntu (Debian) a non-headless jre is required, as well as [additional fonts](http://www.perfectabstractions.com/blog/how-to-install-windows-fonts-in-java-on-linux).
+
+---
