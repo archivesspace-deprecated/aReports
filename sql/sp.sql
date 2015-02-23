@@ -7,6 +7,7 @@ DELIMITER $$
 
 CREATE FUNCTION GetTermType(f_subject_id INT) 
 	RETURNS VARCHAR(255)
+	READS SQL DATA
 BEGIN
 	DECLARE f_term_type VARCHAR(255) DEFAULT "";	
 	
@@ -33,6 +34,7 @@ DELIMITER $$
 
 CREATE FUNCTION GetResourceId(f_resource_id INT, f_archival_object_id INT) 
 	RETURNS INT
+	READS SQL DATA
 BEGIN
 	DECLARE f_root_record_id INT;	
 	
@@ -57,6 +59,7 @@ DELIMITER $$
 
 CREATE FUNCTION GetDigitalObjectId(f_digital_object_id INT, f_digital_component_id INT) 
 	RETURNS INT
+	READS SQL DATA
 BEGIN
 	DECLARE f_root_record_id INT;	
 	
@@ -81,6 +84,7 @@ DELIMITER $$
 
 CREATE FUNCTION GetCoordinate(f_location_id INT) 
 	RETURNS VARCHAR(1020)
+	READS SQL DATA
 BEGIN
 	DECLARE f_coordinate VARCHAR(1020);	
         DECLARE f_coordinate_1 VARCHAR(255);
@@ -119,6 +123,7 @@ DELIMITER $$
 
 CREATE FUNCTION GetEnumValue(f_enum_id INT) 
 	RETURNS VARCHAR(255)
+	READS SQL DATA
 BEGIN
 	DECLARE f_value VARCHAR(255);	
 	
@@ -139,6 +144,7 @@ DELIMITER $$
 
 CREATE FUNCTION GetEnumValueUF(f_enum_id INT) 
 	RETURNS VARCHAR(255)
+	READS SQL DATA
 BEGIN
 	DECLARE f_value VARCHAR(255);	
 	DECLARE f_ovalue VARCHAR(255);
@@ -159,6 +165,7 @@ DELIMITER $$
 
 CREATE FUNCTION GetTotalResources(f_repo_id INT) 
 	RETURNS INT
+	READS SQL DATA
 BEGIN
 	DECLARE f_total INT;	
 	
@@ -179,6 +186,7 @@ DELIMITER $$
 
 CREATE FUNCTION GetTotalResourcesItems(f_repo_id INT) 
 	RETURNS INT
+	READS SQL DATA
 BEGIN
 	DECLARE f_total INT;	
 	
@@ -201,6 +209,7 @@ DELIMITER $$
 
 CREATE FUNCTION GetResourcesWithRestrictions(f_repo_id INT) 
 	RETURNS INT
+	READS SQL DATA
 BEGIN
 	DECLARE f_total INT;	
 	
@@ -223,6 +232,7 @@ DELIMITER $$
 
 CREATE FUNCTION GetResourcesWithFindingAids(f_repo_id INT) 
 	RETURNS INT
+	READS SQL DATA
 BEGIN
 	DECLARE f_total INT;	
 	
@@ -244,6 +254,7 @@ DELIMITER $$
 
 CREATE FUNCTION GetTotalAccessions(f_repo_id INT) 
 	RETURNS INT
+	READS SQL DATA
 BEGIN
 	DECLARE f_total INT;	
 	
@@ -264,6 +275,7 @@ DELIMITER $$
 
 CREATE FUNCTION GetAccessionsProcessed(f_repo_id INT) 
 	RETURNS INT
+	READS SQL DATA
 BEGIN
 	DECLARE f_total INT;	
 	
@@ -293,6 +305,7 @@ DELIMITER $$
 
 CREATE FUNCTION GetAccessionProcessed(f_accession_id INT) 
 	RETURNS VARCHAR(255)
+	READS SQL DATA
 BEGIN
 	DECLARE f_value VARCHAR(255);	
 	
@@ -319,6 +332,7 @@ DELIMITER $$
 
 CREATE FUNCTION GetAccessionProcessedDate(f_accession_id INT) 
 	RETURNS VARCHAR(255)
+	READS SQL DATA
 BEGIN
 	DECLARE f_value VARCHAR(255);	
 	
@@ -345,6 +359,7 @@ DELIMITER $$
 
 CREATE FUNCTION GetAccessionsCataloged(f_repo_id INT) 
 	RETURNS INT
+	READS SQL DATA
 BEGIN
 	DECLARE f_total INT;	
 	
@@ -374,6 +389,7 @@ DELIMITER $$
 
 CREATE FUNCTION GetAccessionCataloged(f_accession_id INT) 
 	RETURNS INT
+	READS SQL DATA
 BEGIN
 	DECLARE f_value INT;	
 	
@@ -401,6 +417,7 @@ DELIMITER $$
 
 CREATE FUNCTION GetAccessionsWithRestrictions(f_repo_id INT) 
 	RETURNS INT
+	READS SQL DATA
 BEGIN
 	DECLARE f_total INT;	
 	
@@ -423,6 +440,7 @@ DELIMITER $$
 
 CREATE FUNCTION GetAccessionsWithRightsTransferred(f_repo_id INT) 
 	RETURNS INT
+	READS SQL DATA
 BEGIN
 	DECLARE f_total INT;	
 	
@@ -447,6 +465,7 @@ DELIMITER $$
 
 CREATE FUNCTION GetAccessionRightsTransferred(f_accession_id INT) 
 	RETURNS INT
+	READS SQL DATA
 BEGIN
 	DECLARE f_value INT;	
 	
@@ -472,6 +491,7 @@ DELIMITER $$
 
 CREATE FUNCTION GetAccessionRightsTransferredNote(f_accession_id INT) 
 	RETURNS VARCHAR(255)
+	READS SQL DATA
 BEGIN
 	DECLARE f_value VARCHAR(255);	
 	
@@ -497,6 +517,7 @@ DELIMITER $$
 
 CREATE FUNCTION GetEventDateExpression(f_record_id INT) 
 	RETURNS VARCHAR(255)
+	READS SQL DATA
 BEGIN
 	DECLARE f_value VARCHAR(255);
         DECLARE f_date VARCHAR(255);
@@ -534,6 +555,7 @@ DELIMITER $$
 
 CREATE FUNCTION GetAgentsPersonal(f_repo_id INT) 
 	RETURNS INT
+	READS SQL DATA
 BEGIN
 	DECLARE f_total INT;	
 	
@@ -557,6 +579,7 @@ DELIMITER $$
 
 CREATE FUNCTION GetAgentsCorporate(f_repo_id INT) 
 	RETURNS INT
+	READS SQL DATA
 BEGIN
 	DECLARE f_total INT;	
 	
@@ -576,6 +599,7 @@ DELIMITER $$
 
 CREATE FUNCTION GetAgentsFamily(f_repo_id INT) 
 	RETURNS INT
+	READS SQL DATA
 BEGIN
 	DECLARE f_total INT;	
 	
@@ -594,6 +618,7 @@ DELIMITER $$
 
 CREATE FUNCTION GetAgentsSoftware(f_repo_id INT) 
 	RETURNS INT
+	READS SQL DATA
 BEGIN
 	DECLARE f_total INT;	
 	
@@ -616,6 +641,7 @@ DELIMITER $$
 CREATE FUNCTION GetAgentMatch(f_agent_type VARCHAR(10), f_agent_id INT, 
                               f_person_id INT, f_family_id INT, f_corporate_id INT, f_software_id INT) 
 	RETURNS INT
+	READS SQL DATA
 BEGIN
 	DECLARE f_agent_match INT;	
 	
@@ -644,6 +670,7 @@ DELIMITER $$
 
 CREATE FUNCTION GetAgentSortName(f_person_id INT, f_family_id INT, f_corporate_id INT) 
 	RETURNS VARCHAR(255)
+	READS SQL DATA
 BEGIN
 	DECLARE f_value VARCHAR(255);	
 	
@@ -670,6 +697,7 @@ DELIMITER $$
 
 CREATE FUNCTION GetResourceHasCreator(f_record_id INT) 
 	RETURNS INT
+	READS SQL DATA
 BEGIN
 	DECLARE f_value INT;	
         
@@ -696,6 +724,7 @@ DELIMITER $$
 
 CREATE FUNCTION GetResourceCreator(f_record_id INT) 
 	RETURNS VARCHAR(1024)
+	READS SQL DATA
 BEGIN
 	DECLARE f_value VARCHAR(1024);	
         
@@ -721,6 +750,7 @@ DELIMITER $$
 
 CREATE FUNCTION GetResourceHasSource(f_record_id INT) 
 	RETURNS INT
+	READS SQL DATA
 BEGIN
 	DECLARE f_value INT;	
         
@@ -747,6 +777,7 @@ DELIMITER $$
 
 CREATE FUNCTION GetResourceHasDeaccession(f_record_id INT) 
 	RETURNS INT
+	READS SQL DATA
 BEGIN
 	DECLARE f_value INT;	
         
@@ -770,6 +801,7 @@ DELIMITER $$
 
 CREATE FUNCTION GetTotalSubjects(f_repo_id INT) 
 	RETURNS INT
+	READS SQL DATA
 BEGIN
 	DECLARE f_total INT;	
 	
@@ -789,6 +821,7 @@ DELIMITER $$
 
 CREATE FUNCTION GetStatusCount(f_repo_id INT, f_status_id INT) 
 	RETURNS INT
+	READS SQL DATA
 BEGIN
 	DECLARE f_total INT;	
 	
@@ -813,6 +846,7 @@ DELIMITER $$
 
 CREATE FUNCTION GetLanguageCount(f_repo_id INT, f_language_id INT) 
 	RETURNS INT
+	READS SQL DATA
 BEGIN
 	DECLARE f_total INT;	
 	
@@ -837,6 +871,7 @@ DELIMITER $$
 
 CREATE FUNCTION GetInstanceCount(f_repo_id INT, f_instance_type_id INT) 
 	RETURNS INT
+	READS SQL DATA
 BEGIN
 	DECLARE f_total INT DEFAULT 0;
 	DECLARE f_id INT;	
@@ -884,6 +919,7 @@ DELIMITER $$
 
 CREATE FUNCTION GetAccessionsExtent(f_repo_id INT, f_extent_type_id INT) 
 	RETURNS DECIMAL(10,2)
+	READS SQL DATA
 BEGIN
 	DECLARE f_total DECIMAL(10,2);	
 	
@@ -912,6 +948,7 @@ DELIMITER $$
 
 CREATE FUNCTION GetAccessionExtent(f_accession_id INT) 
 	RETURNS DECIMAL(10,2)
+	READS SQL DATA
 BEGIN
 	DECLARE f_total DECIMAL(10,2);	
 	
@@ -940,6 +977,7 @@ DELIMITER $$
 
 CREATE FUNCTION GetAccessionExtentType(f_accession_id INT) 
 	RETURNS VARCHAR(255)
+	READS SQL DATA
 BEGIN
 	DECLARE f_value VARCHAR(255);	
 	
@@ -962,6 +1000,7 @@ DELIMITER $$
 
 CREATE FUNCTION GetAccessionContainerSummary(f_accession_id INT) 
 	RETURNS TEXT
+	READS SQL DATA
 BEGIN
 	DECLARE f_value TEXT;	
 	
@@ -982,6 +1021,7 @@ DELIMITER $$
 
 CREATE FUNCTION GetAccessionIdForInstance(f_record_id INT) 
 	RETURNS INT
+	READS SQL DATA
 BEGIN
 	DECLARE f_value INT;
         
@@ -1004,6 +1044,7 @@ DELIMITER $$
 
 CREATE FUNCTION GetResourcesExtent(f_repo_id INT, f_extent_type_id INT) 
 	RETURNS DECIMAL(10,2)
+	READS SQL DATA
 BEGIN
 	DECLARE f_total DECIMAL(10,2);	
 	
@@ -1032,6 +1073,7 @@ DELIMITER $$
 
 CREATE FUNCTION GetResourceExtent(f_resource_id INT) 
 	RETURNS DECIMAL(10,2)
+	READS SQL DATA
 BEGIN
 	DECLARE f_total DECIMAL(10,2);	
 	
@@ -1057,6 +1099,7 @@ DELIMITER $$
 
 CREATE FUNCTION GetResourceExtentType(f_resource_id INT) 
 	RETURNS VARCHAR(255)
+	READS SQL DATA
 BEGIN
 	DECLARE f_value VARCHAR(255);	
 	
@@ -1078,6 +1121,7 @@ DELIMITER $$
 
 CREATE FUNCTION GetResourceContainerSummary(f_resource_id INT) 
 	RETURNS TEXT
+	READS SQL DATA
 BEGIN
 	DECLARE f_value TEXT;	
 	
@@ -1099,6 +1143,7 @@ DELIMITER $$
 
 CREATE FUNCTION GetResourceDeaccessionExtent(f_resource_id INT) 
 	RETURNS DECIMAL(10,2)
+	READS SQL DATA
 BEGIN
 	DECLARE f_total DECIMAL(10,2);	
 	
@@ -1128,6 +1173,7 @@ DELIMITER $$
 
 CREATE FUNCTION GetTermTypeCount(f_term_type_id INT) 
 	RETURNS INT
+	READS SQL DATA
 BEGIN
 	DECLARE f_total INT DEFAULT 0;	
 	
@@ -1153,6 +1199,7 @@ DELIMITER $$
 
 CREATE FUNCTION GetAccessionDateExpression(f_record_id INT) 
 	RETURNS VARCHAR(255)
+	READS SQL DATA
 BEGIN
 	DECLARE f_value VARCHAR(255);
         DECLARE f_date VARCHAR(255);
@@ -1190,6 +1237,7 @@ DELIMITER $$
 
 CREATE FUNCTION GetDigitalObjectDateExpression(f_record_id INT) 
 	RETURNS VARCHAR(255)
+	READS SQL DATA
 BEGIN
 	DECLARE f_value VARCHAR(255);
         DECLARE f_date VARCHAR(255);
@@ -1227,6 +1275,7 @@ DELIMITER $$
 
 CREATE FUNCTION GetResourceDateExpression(f_record_id INT) 
 	RETURNS VARCHAR(255)
+	READS SQL DATA
 BEGIN
 	DECLARE f_value VARCHAR(255);
         DECLARE f_date VARCHAR(255);
@@ -1264,6 +1313,7 @@ DELIMITER $$
 
 CREATE FUNCTION GetResourceIdForInstance(f_record_id INT) 
 	RETURNS INT
+	READS SQL DATA
 BEGIN
 	DECLARE f_value INT;
         
@@ -1285,6 +1335,7 @@ DELIMITER $$
 
 CREATE FUNCTION GetResourceIdentiferForInstance(f_record_id INT) 
 	RETURNS VARCHAR(255)
+	READS SQL DATA
 BEGIN
 	DECLARE f_value VARCHAR(255);
         
@@ -1308,6 +1359,7 @@ DELIMITER $$
 
 CREATE FUNCTION GetResourceIdForInstance(f_record_id INT) 
 	RETURNS INT
+	READS SQL DATA
 BEGIN
 	DECLARE f_value INT;
         
@@ -1332,6 +1384,7 @@ DELIMITER $$
 
 CREATE FUNCTION GetResourceTitleForInstance(f_record_id INT) 
 	RETURNS VARCHAR(255)
+	READS SQL DATA
 BEGIN
 	DECLARE f_value VARCHAR(255);
         
@@ -1355,7 +1408,8 @@ DROP FUNCTION IF EXISTS GetBoolean;
 DELIMITER $$
 
 CREATE FUNCTION GetBoolean(f_value INT) 
-    RETURNS INT
+	RETURNS INT
+	READS SQL DATA
 BEGIN
     DECLARE f_boolean INT;
         
