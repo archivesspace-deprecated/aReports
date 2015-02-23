@@ -324,8 +324,7 @@ END $$
 
 DELIMITER ;
 
--- Function to return the number of accessions that are processed for
--- a particular repository
+-- Function to return the process date for a particular accession
 DROP FUNCTION IF EXISTS GetAccessionProcessedDate;
 
 DELIMITER $$
@@ -405,6 +404,32 @@ BEGIN
         LIMIT 1;
 
 	RETURN GetBoolean(f_value);
+END $$
+
+DELIMITER ;
+
+-- Function to return the process date for a particular accession
+DROP FUNCTION IF EXISTS GetAccessionCatalogedDate;
+
+DELIMITER $$
+
+CREATE FUNCTION GetAccessionCatalogedDate(f_accession_id INT) 
+	RETURNS VARCHAR(255)
+	READS SQL DATA
+BEGIN
+	DECLARE f_value VARCHAR(255);	
+	
+	SELECT GetEventDateExpression(T1.event_id) INTO f_value  
+	FROM 
+            event_link_rlshp T1 
+	INNER JOIN 
+            event T2 ON T1.event_id = T2.id 
+	WHERE 
+            (T1.accession_id = f_accession_id  
+	AND 
+            GetEnumValue(T2.event_type_id) = 'cataloged' COLLATE utf8_general_ci);
+	    
+	RETURN f_value;
 END $$
 
 DELIMITER ;
@@ -1364,12 +1389,14 @@ BEGIN
 	DECLARE f_value INT;
         
         -- get the resource id 
-	SELECT T2.`id` INTO f_value  
+	SELECT 
+            T2.`id` INTO f_value  
 	FROM 
             instance T1
         INNER JOIN
             resource T2 ON GetResourceID(T1.`resource_id`, T1.`archival_object_id`) = T2.`id`
-	WHERE T1.`id` = f_record_id; 
+	WHERE 
+            T1.`id` = f_record_id; 
     
 	RETURN f_value;
 END $$
@@ -1389,12 +1416,14 @@ BEGIN
 	DECLARE f_value VARCHAR(255);
         
         -- get the resource id 
-	SELECT T2.`title` INTO f_value  
+	SELECT 
+            T2.`title` INTO f_value  
 	FROM 
             instance T1
         INNER JOIN
             resource T2 ON GetResourceID(T1.`resource_id`, T1.`archival_object_id`) = T2.`id`
-	WHERE T1.`id` = f_record_id; 
+	WHERE 
+            T1.`id` = f_record_id; 
     
 	RETURN f_value;
 END $$
@@ -1402,7 +1431,6 @@ END $$
 DELIMITER ;
 
 -- function to return a 0 or 1 to represent a boolean value to the report
--- Function to return the resource id for a given instance
 DROP FUNCTION IF EXISTS GetBoolean;
 
 DELIMITER $$
@@ -1420,6 +1448,29 @@ BEGIN
     END IF;
 
     RETURN f_boolean;
+END $$
+
+DELIMITER ;
+
+-- function to return the name of a repository given the id
+DROP FUNCTION IF EXISTS GetRepositoryName;
+
+DELIMITER $$
+
+CREATE FUNCTION GetRepositoryName(f_record_id INT) 
+	RETURNS VARCHAR(255)
+	READS SQL DATA
+BEGIN
+    DECLARE f_value VARCHAR(255);
+
+    SELECT 
+        `name` INTO f_value  
+    FROM 
+        repository 
+    WHERE 
+        `id` = f_record_id; 
+    
+    RETURN f_value;
 END $$
 
 DELIMITER ;
