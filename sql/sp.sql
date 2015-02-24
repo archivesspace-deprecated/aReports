@@ -977,13 +977,12 @@ CREATE FUNCTION GetAccessionExtent(f_accession_id INT)
 BEGIN
 	DECLARE f_total DECIMAL(10,2);	
 	
-	SELECT SUM(T1.number) INTO f_total  
+	SELECT 
+            SUM(T1.number) INTO f_total  
 	FROM 
-            extent T1 
-	INNER JOIN 
-            accession T2 ON T1.accession_id = T2.id 
+            extent T1
 	WHERE 
-            T2.id = f_accession_id;
+            T1.accession_id = f_accession_id;
 	
 	-- Check for null then set it to zero
 	IF f_total IS NULL THEN
@@ -1006,7 +1005,8 @@ CREATE FUNCTION GetAccessionExtentType(f_accession_id INT)
 BEGIN
 	DECLARE f_value VARCHAR(255);	
 	
-	SELECT GetEnumValueUF(T1.extent_type_id) INTO f_value  
+	SELECT 
+            GetEnumValueUF(T1.extent_type_id) INTO f_value  
 	FROM 
             extent T1 
 	WHERE 
@@ -1018,7 +1018,7 @@ END $$
 
 DELIMITER ;
 
--- Function to return the accession extent type
+-- Function to return the accession container summary
 DROP FUNCTION IF EXISTS GetAccessionContainerSummary;
 
 DELIMITER $$
@@ -1073,12 +1073,14 @@ CREATE FUNCTION GetResourcesExtent(f_repo_id INT, f_extent_type_id INT)
 BEGIN
 	DECLARE f_total DECIMAL(10,2);	
 	
-	SELECT SUM(T1.number) INTO f_total  
-	FROM extent T1 
+	SELECT 
+            SUM(T1.number) INTO f_total  
+	FROM 
+            extent T1 
 	INNER JOIN 
-		resource T2 ON GetResourceId(T1.resource_id, T1.archival_object_id) = T2.id 
-	WHERE (T2.repo_id = f_repo_id   
-		AND T1.extent_type_id = f_extent_type_id);
+            resource T2 ON GetResourceId(T1.resource_id, T1.archival_object_id) = T2.id 
+	WHERE 
+            (T2.repo_id = f_repo_id AND T1.extent_type_id = f_extent_type_id);
 	
 	-- Check for null then set it to zero
 	IF f_total IS NULL THEN
@@ -1102,9 +1104,12 @@ CREATE FUNCTION GetResourceExtent(f_resource_id INT)
 BEGIN
 	DECLARE f_total DECIMAL(10,2);	
 	
-	SELECT SUM(T1.number) INTO f_total  
-	FROM extent T1 
-	WHERE T1.resource_id = f_resource_id;
+	SELECT 
+            SUM(T1.number) INTO f_total  
+	FROM 
+            extent T1 
+	WHERE 
+            T1.resource_id = f_resource_id;
 	
 	-- Check for null then set it to zero
 	IF f_total IS NULL THEN
@@ -1172,8 +1177,8 @@ CREATE FUNCTION GetResourceDeaccessionExtent(f_resource_id INT)
 BEGIN
 	DECLARE f_total DECIMAL(10,2);	
 	
-	SELECT SUM(T2.number) 
-            INTO f_total  
+	SELECT 
+            SUM(T2.number) INTO f_total  
 	FROM 
             deaccession T1
         INNER JOIN 
@@ -1248,6 +1253,49 @@ BEGIN
             SET f_value = CONCAT(f_expression, ' , ', f_date);
         ELSE
             SET f_value = f_expression;
+        END IF;
+    
+	RETURN f_value;
+END $$
+
+DELIMITER ;
+
+-- Function to return a particula part of a date record for an accession record
+-- f_part = 0 return date expression
+-- f_part = 1 return date begin
+-- f_part = 2 return date end
+DROP FUNCTION IF EXISTS GetAccessionDatePart;
+
+DELIMITER $$
+
+CREATE FUNCTION GetAccessionDatePart(f_record_id INT, f_date_type VARCHAR(255), f_part INT) 
+	RETURNS VARCHAR(255)
+	READS SQL DATA
+BEGIN
+	DECLARE f_value VARCHAR(255);
+        DECLARE f_expression VARCHAR(255);
+        DECLARE f_begin VARCHAR(255);
+        DECLARE f_end VARCHAR(255);
+	
+	SELECT 
+            date.`expression`, date.`begin`, date.`end` 
+        INTO 
+            f_expression, f_begin, f_end 
+	FROM 
+            date 
+	WHERE (
+            date.`accession_id` = f_record_id
+            AND
+            GetEnumValue(date.`date_type_id`) = f_date_type COLLATE utf8_general_ci )
+        LIMIT 1;
+	
+        -- return the part we need
+        IF f_part = 0 THEN
+            SET f_value = f_expression;
+        ELSEIF f_part = 1 THEN
+            SET f_value = f_begin;
+        ELSE
+            SET f_value = f_end;
         END IF;
     
 	RETURN f_value;
@@ -1471,6 +1519,90 @@ BEGIN
         `id` = f_record_id; 
     
     RETURN f_value;
+END $$
+
+DELIMITER ;
+
+-- Function to return the date expression for an accession record
+DROP FUNCTION IF EXISTS GetDeaccessionDate;
+
+DELIMITER $$
+
+CREATE FUNCTION GetDeaccessionDate(f_record_id INT) 
+	RETURNS VARCHAR(255)
+	READS SQL DATA
+BEGIN
+	DECLARE f_value VARCHAR(255);
+        DECLARE f_expression VARCHAR(255);
+        DECLARE f_begin VARCHAR(255);
+	
+	SELECT date.`expression`, date.`begin`
+        INTO f_expression, f_begin
+	FROM 
+            date 
+	WHERE date.`deaccession_id` = f_record_id 
+        LIMIT 1;
+	
+        -- If the expression is null return then return the begin       
+        IF f_expression IS NULL THEN
+            SET f_value = f_begin;
+        ELSE
+            SET f_value = f_expression;
+        END IF;
+    
+	RETURN f_value;
+END $$
+
+DELIMITER ;
+
+-- Function to return the total extent for an deaccession record
+DROP FUNCTION IF EXISTS GetDeaccessionExtent;
+
+DELIMITER $$
+
+CREATE FUNCTION GetDeaccessionExtent(f_deaccession_id INT) 
+	RETURNS DECIMAL(10,2)
+	READS SQL DATA
+BEGIN
+	DECLARE f_total DECIMAL(10,2);	
+	
+	SELECT 
+            SUM(T1.number) INTO f_total  
+	FROM 
+            extent T1 
+	WHERE 
+            T1.deaccession_id = f_deaccession_id;
+	
+	-- Check for null then set it to zero
+	IF f_total IS NULL THEN
+            SET f_total = 0;
+	END IF;
+	
+	RETURN f_total;
+END $$
+
+DELIMITER ;
+
+-- Function to return the deaccession extent type
+DROP FUNCTION IF EXISTS GetDeaccessionExtentType;
+
+DELIMITER $$
+
+CREATE FUNCTION GetDeaccessionExtentType(f_deaccession_id INT) 
+	RETURNS VARCHAR(255)
+	READS SQL DATA
+BEGIN
+	DECLARE f_value VARCHAR(255);	
+	
+	SELECT 
+            GetEnumValueUF(T1.extent_type_id) INTO f_value  
+	FROM 
+            extent T1 
+	WHERE 
+            T1.deaccession_id = f_deaccession_id
+        LIMIT 1;
+	
+	RETURN f_value;
 END $$
 
 DELIMITER ;
