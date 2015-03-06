@@ -95,12 +95,15 @@ public class AReportsFrame extends javax.swing.JFrame {
         // get the reports files
         value = preferences.get("reports.directory", null);
         
-        if(value == null) {
-            value = reportsDirectory.getAbsolutePath();
-        } else {
-            this.reportsDirectory = new File(value);
+        if(value != null) {
+            File directory = new File(value);
+            
+            if(directory.exists()) {
+                this.reportsDirectory = directory;    
+            }
         }
         
+        value = this.reportsDirectory.getAbsolutePath();
         reportsDirectoryTextField.setText(value);          
     }
 
@@ -186,7 +189,7 @@ public class AReportsFrame extends javax.swing.JFrame {
         jLabel12 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("aReports -- A Desktop Archivesspace Reports Engine (v0.2 02/06/2015)");
+        setTitle("aReports -- A Desktop Archivesspace Reports Engine (v0.21 03/06/2015)");
 
         closeButton.setText("Close");
         closeButton.addActionListener(new java.awt.event.ActionListener() {
@@ -478,8 +481,6 @@ public class AReportsFrame extends javax.swing.JFrame {
                     .addComponent(disconnectButton)
                     .addComponent(pushButton)))
         );
-
-        getAccessibleContext().setAccessibleName("aReports -- A Desktop Archivesspace Reports Engine (v0.2 02/06/2015)");
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
