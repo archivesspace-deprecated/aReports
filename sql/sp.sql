@@ -509,6 +509,32 @@ END $$
 
 DELIMITER ;
 
+-- Function to return if  acknowlegement has been set for accession
+DROP FUNCTION IF EXISTS GetAccessionAcknowledgementSent;
+
+DELIMITER $$
+
+CREATE FUNCTION GetAccessionAcknowledgementSent(f_accession_id INT) 
+	RETURNS INT
+	READS SQL DATA
+BEGIN
+	DECLARE f_value INT;	
+	
+	SELECT T1.id INTO f_value  
+	FROM 
+            event T1 
+	INNER JOIN 
+            event_link_rlshp T2 ON T1.id = T2.event_id 
+	WHERE 
+            T2.accession_id = f_accession_id 
+	AND 
+            GetEnumValue(T1.event_type_id) = 'acknowledgement_sent' COLLATE utf8_general_ci;
+	    
+	RETURN GetBoolean(f_value);
+END $$
+
+DELIMITER ;
+
 -- Function to return if an accession has had it's rights transferred
 DROP FUNCTION IF EXISTS GetAccessionRightsTransferredNote;
 
