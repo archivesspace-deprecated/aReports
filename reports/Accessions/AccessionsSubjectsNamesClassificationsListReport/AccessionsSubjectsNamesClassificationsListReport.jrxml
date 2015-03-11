@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="accessionsSubjectsNamesList" pageWidth="612" pageHeight="792" columnWidth="532" leftMargin="40" rightMargin="40" topMargin="50" bottomMargin="18" isTitleNewPage="true" uuid="06eede3f-d559-4b28-9af6-688c6b83f816">
-	<property name="reportTitle" value="Accessions and linked names and subjects list"/>
-	<property name="reportDescription" value="Displays accessions and their linked names and subjects. Report contains accession number, linked resources, accession date, title, extent, linked names, and linked subjects."/>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="accessionsSubjectsNamesClassificationsList" pageWidth="612" pageHeight="792" columnWidth="532" leftMargin="40" rightMargin="40" topMargin="50" bottomMargin="18" isTitleNewPage="true" uuid="06eede3f-d559-4b28-9af6-688c6b83f816">
+	<property name="reportTitle" value="Accessions and linked names, subjects, and classifications list"/>
+	<property name="reportDescription" value="Displays accessions and their linked names, subjects, and classifications. Report contains accession number, linked resources, accession date, title, extent, linked names, and linked subjects."/>
 	<property name="ireport.scriptlethandling" value="0"/>
 	<property name="ireport.encoding" value="UTF-8"/>
 	<property name="ireport.zoom" value="1.0"/>
-	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="130"/>
+	<property name="ireport.x" value="32"/>
+	<property name="ireport.y" value="144"/>
 	<import value="net.sf.jasperreports.engine.*"/>
 	<import value="java.util.*"/>
 	<import value="net.sf.jasperreports.engine.data.*"/>
@@ -101,7 +101,7 @@ FROM
 					<font fontName="Arial" size="20" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica-Bold" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$P{ReportHeader}.equals("") ? "Accessions and Linked Subjects and Names" : $P{ReportHeader}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{ReportHeader}.equals("") ? "Accessions and Linked Subjects, Names and Classifications" : $P{ReportHeader}]]></textFieldExpression>
 			</textField>
 		</band>
 	</title>
@@ -112,7 +112,7 @@ FROM
 		<band splitType="Stretch"/>
 	</columnHeader>
 	<detail>
-		<band height="119" splitType="Stretch">
+		<band height="133" splitType="Stretch">
 			<subreport isUsingCache="true">
 				<reportElement key="subreport-6" positionType="Float" isPrintRepeatedValues="false" x="10" y="38" width="510" height="5" isRemoveLineWhenBlank="true" forecolor="#000000" backcolor="#FFFFFF" uuid="19699fc6-1309-43b9-bb60-c49cacccf5df"/>
 				<subreportParameter name="accessionId">
@@ -262,6 +262,14 @@ replace(",", ".")]]></textFieldExpression>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{title}.equals("") ? "[no title]" : $F{title}]]></textFieldExpression>
 			</textField>
+			<subreport>
+				<reportElement key="subreport-10" positionType="Float" isPrintRepeatedValues="false" x="10" y="118" width="510" height="10" isRemoveLineWhenBlank="true" uuid="e5e61a22-67d0-45ee-8a40-7f486d8ea83d"/>
+				<subreportParameter name="accessionId">
+					<subreportParameterExpression><![CDATA[$F{accessionId}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{basePath} + "/sub_accessionsClassifications.jasper"]]></subreportExpression>
+			</subreport>
 		</band>
 	</detail>
 	<columnFooter>
@@ -316,7 +324,7 @@ replace(",", ".")]]></textFieldExpression>
 					<font fontName="Arial" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$P{ReportHeader}.equals("") ? "Accessions and Linked Subjects and Names" : $P{ReportHeader}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{ReportHeader}.equals("") ? "Accessions and Linked Subjects, Names, and Classifications" : $P{ReportHeader}]]></textFieldExpression>
 			</textField>
 			<textField evaluationTime="Report" pattern="MMMMM dd, yyyy" isBlankWhenNull="false">
 				<reportElement key="textField-6" positionType="Float" x="0" y="34" width="255" height="15" forecolor="#000000" uuid="9d9af8a8-4964-4e7a-a002-baaa6c937cf8"/>

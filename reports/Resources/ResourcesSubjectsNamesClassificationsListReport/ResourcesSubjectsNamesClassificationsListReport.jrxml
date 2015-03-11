@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="resourcesSubjectsNamesList" pageWidth="612" pageHeight="792" columnWidth="532" leftMargin="40" rightMargin="40" topMargin="50" bottomMargin="18" isTitleNewPage="true" uuid="d97e8a3d-0c6a-4532-972a-ad882f34e3f5">
-	<property name="reportTitle" value="Resource(s) and subjects and name(s) linked as subjects"/>
-	<property name="reportDescription" value="Displays resource(s) and linked subjects and names linked as subjects. Report contains title, resource identifier, level, date range, linked names and their functions, and linked subjects."/>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="resourcesSubjectsNamesClassificationsList" pageWidth="612" pageHeight="792" columnWidth="532" leftMargin="40" rightMargin="40" topMargin="50" bottomMargin="18" isTitleNewPage="true" uuid="d97e8a3d-0c6a-4532-972a-ad882f34e3f5">
+	<property name="reportTitle" value="Resource(s) and subjects, classification(s) and name(s) linked as subjects"/>
+	<property name="reportDescription" value="Displays resource(s) and linked subjects, classification, and names linked as subjects. Report contains title, resource identifier, level, date range, linked names and their functions, and linked subjects."/>
 	<property name="ireport.scriptlethandling" value="0"/>
 	<property name="ireport.encoding" value="UTF-8"/>
 	<property name="ireport.zoom" value="1.0"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="104"/>
+	<property name="ireport.y" value="148"/>
 	<import value="net.sf.jasperreports.engine.*"/>
 	<import value="java.util.*"/>
 	<import value="net.sf.jasperreports.engine.data.*"/>
@@ -59,7 +59,7 @@ FROM
 					<font fontName="Arial" size="20" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica-Bold" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$P{ReportHeader}.equals("") ? "Resources with Linked Subjects and Names" : $P{ReportHeader}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{ReportHeader}.equals("") ? "Resources with Linked Subjects, Names and Classifications" : $P{ReportHeader}]]></textFieldExpression>
 			</textField>
 			<textField evaluationTime="Report" isBlankWhenNull="false">
 				<reportElement key="textField-13" positionType="Float" x="372" y="221" width="55" height="13" forecolor="#000000" uuid="b0f82102-5eda-4d89-bbf3-b48623a62070"/>
@@ -125,7 +125,7 @@ FROM
 		<band splitType="Stretch"/>
 	</columnHeader>
 	<detail>
-		<band height="127" splitType="Immediate">
+		<band height="135" splitType="Immediate">
 			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
 				<reportElement key="textField-15" positionType="Float" mode="Transparent" x="2" y="18" width="524" height="21" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF" uuid="178257c5-da59-4e1d-9731-38204c95ba01"/>
 				<box>
@@ -259,6 +259,14 @@ replace(",", ".")]]></textFieldExpression>
 				</textElement>
 				<text><![CDATA[Dates:]]></text>
 			</staticText>
+			<subreport>
+				<reportElement key="subreport-5" positionType="Float" x="13" y="122" width="513" height="10" uuid="de2d0429-1878-48b1-830d-1739c2e1d686"/>
+				<subreportParameter name="resourceId">
+					<subreportParameterExpression><![CDATA[$F{resourceId}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{basePath} + "/sub_resourcesClassifications.jasper"]]></subreportExpression>
+			</subreport>
 		</band>
 	</detail>
 	<columnFooter>
@@ -313,7 +321,7 @@ replace(",", ".")]]></textFieldExpression>
 					<font fontName="Arial" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$P{ReportHeader}.equals("") ? "Resources with Linked Subjects and Names" : $P{ReportHeader}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{ReportHeader}.equals("") ? "Resources with Linked Subjects, Names and Classifications" : $P{ReportHeader}]]></textFieldExpression>
 			</textField>
 			<line>
 				<reportElement x="0" y="4" width="533" height="1" uuid="fef540fb-bada-44cd-b619-e5e4254bdb0c"/>

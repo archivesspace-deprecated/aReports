@@ -100,7 +100,7 @@ GROUP BY
 	</columnHeader>
 	<detail>
 		<band height="17" splitType="Stretch">
-			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="false">
+			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
 				<reportElement key="textField" positionType="Float" mode="Transparent" x="385" y="0" width="105" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="7ea33c5f-e4d6-4386-91a2-f83697b4a2b7"/>
 				<box>
 					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>

@@ -20,13 +20,11 @@
 FROM
      `subject_rlshp` T1
 INNER JOIN
-     `subject` T2 ON GetDigitalObjectId(T1.`digital_object_id`, T1.`digital_object_component_id`) = $P{digitalObjectId}
+     `subject` T2 ON T1.`subject_id` = T2.`id`
 WHERE
      GetDigitalObjectId(T1.`digital_object_id`, T1.`digital_object_component_id`) = $P{digitalObjectId}
 GROUP BY
-     T2.`id`
-
-]]>
+     T2.`id`]]>
 	</queryString>
 	<field name="subject_id" class="java.lang.Integer"/>
 	<field name="subjectTerm" class="java.lang.String"/>
