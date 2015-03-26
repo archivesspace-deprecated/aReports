@@ -71,7 +71,7 @@ public class AReportsFrame extends javax.swing.JFrame {
         
         preferences = Preferences.userRoot().node(this.getClass().getName());
 
-        String value = preferences.get("jdbc.url", "jdbc:mysql://tracerdb.cyo37z0ucix8.us-east-1.rds.amazonaws.com/aspace1");
+        String value = preferences.get("jdbc.url", "jdbc:mysql://52.11.218.54/archivesspace");
         jdbcURLTextField.setText(value);
 
         value = preferences.get("jdbc.username", "aspace");
@@ -189,7 +189,7 @@ public class AReportsFrame extends javax.swing.JFrame {
         jLabel12 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("aReports -- A Desktop Archivesspace Reports Engine (v0.2.2 03/09/2015)");
+        setTitle("aReports -- A Desktop Archivesspace Reports Engine (v0.2.3 03/25/2015)");
 
         closeButton.setText("Close");
         closeButton.addActionListener(new java.awt.event.ActionListener() {

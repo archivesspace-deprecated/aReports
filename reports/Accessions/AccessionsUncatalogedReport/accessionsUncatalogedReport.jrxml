@@ -6,7 +6,7 @@
 	<property name="ireport.encoding" value="UTF-8"/>
 	<property name="ireport.zoom" value="1.0"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="146"/>
+	<property name="ireport.y" value="140"/>
 	<import value="net.sf.jasperreports.engine.*"/>
 	<import value="java.util.*"/>
 	<import value="net.sf.jasperreports.engine.data.*"/>
@@ -39,9 +39,9 @@ FROM
 		<fieldDescription><![CDATA[]]></fieldDescription>
 	</field>
 	<field name="accessionDate" class="java.sql.Date"/>
-	<field name="accessionProcessed" class="java.lang.String"/>
+	<field name="accessionProcessed" class="java.lang.Boolean"/>
 	<field name="accessionProcessedDate" class="java.util.Date"/>
-	<field name="cataloged" class="java.lang.Integer"/>
+	<field name="cataloged" class="java.lang.Boolean"/>
 	<field name="catalogedDate" class="java.util.Date"/>
 	<field name="extentNumber" class="java.math.BigDecimal"/>
 	<field name="extentType" class="java.lang.String"/>
@@ -184,7 +184,11 @@ FROM
 					<font fontName="Arial" size="12" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{accessionNumber}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{accessionNumber}.replace("[", "").
+replace("]","").
+replace("\"","").
+replace(",null", "").
+replace(",", ".")]]></textFieldExpression>
 			</textField>
 			<subreport isUsingCache="true">
 				<reportElement key="subreport-1" positionType="Float" mode="Opaque" x="10" y="79" width="517" height="7" isRemoveLineWhenBlank="true" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF" uuid="7fc2791b-defc-46bb-b4f0-e49d6753c0bc"/>
@@ -219,7 +223,7 @@ FROM
 					<font fontName="Arial" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
-				<textFieldExpression><![CDATA[("" + $F{extentNumber}).equals("0.0") || $F{containerSummary}.equals(null) ? "" : ("" + $F{extentNumber} + " " + $F{extentType})]]></textFieldExpression>
+				<textFieldExpression><![CDATA[("" + $F{extentNumber}).equals("0.0") ? "" : ("" + $F{extentNumber} + " " + $F{extentType})]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="MM/dd/yyyy" isBlankWhenNull="true">
 				<reportElement key="textField-4" positionType="Float" mode="Transparent" x="118" y="58" width="85" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="7fc6be27-599c-4ef5-8bcf-561017866a40"/>

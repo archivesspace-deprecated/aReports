@@ -272,7 +272,11 @@ FROM
 					<font fontName="Arial" size="12" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{accessionNumber}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{accessionNumber}.replace("[", "").
+replace("]","").
+replace("\"","").
+replace(",null", "").
+replace(",", ".")]]></textFieldExpression>
 			</textField>
 			<staticText>
 				<reportElement key="staticText-14" positionType="Float" x="409" y="51" width="64" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="8a255d99-e3a5-4d2e-82e1-c0b95d18f382"/>
