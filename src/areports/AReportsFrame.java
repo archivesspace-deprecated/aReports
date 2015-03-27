@@ -53,7 +53,7 @@ public class AReportsFrame extends javax.swing.JFrame {
     private Preferences preferences;
 
     private File reportsDirectory;
-
+    
     /**
      * Creates new form AReportsFrame
      */
@@ -70,8 +70,16 @@ public class AReportsFrame extends javax.swing.JFrame {
         this.reportsDirectory = reportsDirectory;
         
         preferences = Preferences.userRoot().node(this.getClass().getName());
-
-        String value = preferences.get("jdbc.url", "jdbc:mysql://52.11.218.54/archivesspace");
+        
+        String defaultDatabaseURL = "jdbc:mysql://52.11.218.54/archivesspace";
+        String value = preferences.get("jdbc.url", defaultDatabaseURL);
+        
+        // check to make sure we not connecting to the old tracer. If so point to the
+        // new host
+        if(value.contains("tracerdb.cyo37z0ucix8")) {
+            value = defaultDatabaseURL;
+        }
+        
         jdbcURLTextField.setText(value);
 
         value = preferences.get("jdbc.username", "aspace");
