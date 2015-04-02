@@ -71,7 +71,7 @@ public class AReportsFrame extends javax.swing.JFrame {
         
         preferences = Preferences.userRoot().node(this.getClass().getName());
         
-        String defaultDatabaseURL = "jdbc:mysql://52.11.218.54/archivesspace";
+        String defaultDatabaseURL = "jdbc:mysql://test.archivesspace.org/archivesspace";
         String value = preferences.get("jdbc.url", defaultDatabaseURL);
         
         // check to make sure we not connecting to the old tracer. If so point to the
@@ -197,7 +197,7 @@ public class AReportsFrame extends javax.swing.JFrame {
         jLabel12 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("aReports -- A Desktop Archivesspace Reports Engine (v0.2.3 03/25/2015)");
+        setTitle("aReports -- A Desktop Archivesspace Reports Engine (v0.2.3 04/02/2015)");
 
         closeButton.setText("Close");
         closeButton.addActionListener(new java.awt.event.ActionListener() {
