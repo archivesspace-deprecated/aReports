@@ -9,7 +9,7 @@
 	<import value="java.util.*"/>
 	<import value="net.sf.jasperreports.engine.data.*"/>
 	<parameter name="accessionId" class="java.lang.Integer" isForPrompting="false">
-		<defaultValueExpression><![CDATA[1]]></defaultValueExpression>
+		<defaultValueExpression><![CDATA[18]]></defaultValueExpression>
 	</parameter>
 	<queryString>
 		<![CDATA[SELECT
@@ -22,7 +22,7 @@
 FROM
      `deaccession` deaccession
 WHERE
-     deaccession.`accession_id` = $P{accessionId}    ]]>
+     deaccession.`accession_id` = $P{accessionId}]]>
 	</queryString>
 	<field name="deaccessionId" class="java.lang.Integer"/>
 	<field name="description" class="java.lang.String">

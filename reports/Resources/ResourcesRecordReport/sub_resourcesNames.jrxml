@@ -22,7 +22,7 @@ FROM
 WHERE
      GetResourceId(T1.`resource_id`, T1.`archival_object_id`) = $P{resourceId}
 GROUP BY
-     GetAgentSortname(T1.`agent_person_id`, T1.`agent_family_id`, T1.`agent_corporate_entity_id`)]]>
+     GetAgentUniqueName(T1.`agent_person_id`, T1.`agent_family_id`, T1.`agent_corporate_entity_id`, T1.`role_id`)]]>
 	</queryString>
 	<field name="linked_agents_rlshp_id" class="java.lang.Integer"/>
 	<field name="sortName" class="java.lang.String"/>

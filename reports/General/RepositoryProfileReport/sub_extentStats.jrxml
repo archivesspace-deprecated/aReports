@@ -20,8 +20,7 @@
 FROM
      `extent` extent
 GROUP BY
-     extent.`extent_type_id`
- ]]>
+     extent.`extent_type_id`]]>
 	</queryString>
 	<field name="extent_extent_type_id" class="java.lang.Integer"/>
 	<field name="extentType" class="java.lang.String"/>

@@ -21,9 +21,7 @@
 FROM
      `linked_agents_rlshp` T1
 WHERE
-     T1.`accession_id` = $P{accessionId}
-GROUP BY
-     GetAgentSortname(T1.`agent_person_id`, T1.`agent_family_id`, T1.`agent_corporate_entity_id`)]]>
+     T1.`accession_id` = $P{accessionId}]]>
 	</queryString>
 	<field name="linked_agents_rlshp_id" class="java.lang.Integer"/>
 	<field name="sortName" class="java.lang.String"/>

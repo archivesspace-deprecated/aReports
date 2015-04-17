@@ -289,9 +289,7 @@ BEGIN
         AND
             T1.accession_id IS NOT NULL
 	AND 
-            GetEnumValue(T2.event_type_id) = 'processed' COLLATE utf8_general_ci)
-        GROUP BY 
-            T1.accession_id;
+            GetEnumValue(T2.event_type_id) = 'processed' COLLATE utf8_general_ci);
 	    
 	RETURN f_total;
 END $$
@@ -372,9 +370,7 @@ BEGIN
 	AND 
             T2.accession_id IS NOT NULL 
 	AND 
-            GetEnumValue(T1.event_type_id) = 'cataloged' COLLATE utf8_general_ci)
-	GROUP BY 
-            T2.accession_id;
+            GetEnumValue(T1.event_type_id) = 'cataloged' COLLATE utf8_general_ci);
 	    
 	RETURN f_total;
 END $$
@@ -470,13 +466,16 @@ BEGIN
 	DECLARE f_total INT;	
 	
 	SELECT count(T2.accession_id) INTO f_total  
-	FROM event T1 
+	FROM 
+            event T1 
 	INNER JOIN 
-		event_link_rlshp T2 ON T1.id = T2.event_id 
-	WHERE (T1.repo_id = f_repo_id  
-	AND T2.accession_id IS NOT NULL 
-	AND GetEnumValue(T1.event_type_id) = 'rights_transferred' COLLATE utf8_general_ci)
-	GROUP BY T2.accession_id;
+            event_link_rlshp T2 ON T1.id = T2.event_id 
+	WHERE ( 
+            T1.repo_id = f_repo_id  
+	AND 
+            T2.accession_id IS NOT NULL 
+	AND 
+            GetEnumValue(T1.event_type_id) = 'rights_transferred' COLLATE utf8_general_ci);
 	    
 	RETURN f_total;
 END $$
@@ -713,7 +712,7 @@ END $$
 
 DELIMITER ; 
 
--- Function to return the sortname given a Person, Family, Corporate, or Software
+-- Function to return the sortname given a Person, Family, or Corporate
 -- when those ids found in the linked_agents_rlshp are passed in as parameters
 DROP FUNCTION IF EXISTS GetAgentSortName;
 
@@ -726,16 +725,43 @@ BEGIN
 	DECLARE f_value VARCHAR(255);	
 	
 	IF f_person_id IS NOT NULL THEN
-            SELECT sort_name INTO f_value FROM name_person WHERE id = f_person_id;
+            SELECT sort_name INTO f_value FROM name_person WHERE agent_person_id = f_person_id LIMIT 1;
         ELSEIF f_family_id IS NOT NULL THEN
-            SELECT sort_name INTO f_value FROM name_family WHERE id = f_family_id;
+            SELECT sort_name INTO f_value FROM name_family WHERE agent_family_id = f_family_id LIMIT 1;
         ELSEIF f_corporate_id IS NOT NULL THEN
-            SELECT sort_name INTO f_value FROM name_corporate_entity WHERE id = f_corporate_id;
+            SELECT sort_name INTO f_value FROM name_corporate_entity WHERE agent_corporate_entity_id = f_corporate_id LIMIT 1;
         ELSE 
             SET f_value = 'Unknown';
         END IF;
 
 	RETURN f_value;
+END $$
+
+DELIMITER ;
+
+-- Function to return the sortname given a Person, Family, or Corporate + the role Id
+-- when those ids found in the linked_agents_rlshp are passed in as parameters
+DROP FUNCTION IF EXISTS GetAgentUniqueName;
+
+DELIMITER $$
+
+CREATE FUNCTION GetAgentUniqueName(f_person_id INT, f_family_id INT, f_corporate_id INT, f_role_id INT) 
+	RETURNS VARCHAR(255)
+	READS SQL DATA
+BEGIN
+	DECLARE f_value VARCHAR(255);	
+	
+	IF f_person_id IS NOT NULL THEN
+            SELECT sort_name INTO f_value FROM name_person WHERE agent_person_id = f_person_id LIMIT 1;
+        ELSEIF f_family_id IS NOT NULL THEN
+            SELECT sort_name INTO f_value FROM name_family WHERE agent_family_id = f_family_id LIMIT 1;
+        ELSEIF f_corporate_id IS NOT NULL THEN
+            SELECT sort_name INTO f_value FROM name_corporate_entity WHERE agent_corporate_entity_id = f_corporate_id LIMIT 1;
+        ELSE 
+            SET f_value = 'Unknown';
+        END IF;
+
+	RETURN CONCAT_WS('-',f_value, f_role_id);
 END $$
 
 DELIMITER ;
@@ -914,8 +940,8 @@ END $$
 
 DELIMITER ;
 
--- Function to return the number of instances for a particular instance
--- type in a repository. I coudn't find a simple way to do this counting
+-- Function to return the number of instances for a particular instance type 
+-- in a repository. I couldn't find a simpler way to do this counting
 DROP FUNCTION IF EXISTS GetInstanceCount;
 
 DELIMITER $$
@@ -930,28 +956,28 @@ BEGIN
 	
 	DECLARE cur CURSOR FOR SELECT T1.`id`  
 	FROM 
-		resource T1
+            resource T1
 	INNER JOIN
-    		instance T2 ON GetResourceId(T2.`resource_id`, T2.`archival_object_id`) = T1.`id`
-                WHERE 
-		T1.`repo_id` = f_repo_id
-		AND
-    		T2.`instance_type_id` = f_instance_type_id 
+            instance T2 ON GetResourceId(T2.`resource_id`, T2.`archival_object_id`) = T1.`id`
+        WHERE 
+            T1.`repo_id` = f_repo_id
+	AND
+            T2.`instance_type_id` = f_instance_type_id 
 	GROUP BY
-		T1.`id`;	
+            T1.`id`;	
 	
 	DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
 	
 	OPEN cur;
 	
 	count_resource: LOOP
-		FETCH cur INTO f_id;
+            FETCH cur INTO f_id;
 	
-		IF done = 1 THEN
-			LEAVE count_resource;
-		END IF;
+            IF done = 1 THEN
+		LEAVE count_resource;
+            END IF;
 		
-		SET f_total = f_total + 1;
+            SET f_total = f_total + 1;
 	
 	END LOOP count_resource;
 	
@@ -1233,15 +1259,18 @@ CREATE FUNCTION GetTermTypeCount(f_term_type_id INT)
 BEGIN
 	DECLARE f_total INT DEFAULT 0;	
 	
-	SELECT COUNT(T1.`id`) INTO f_total 
-	FROM 
-            term T1
-	INNER JOIN
-	    subject_term T2 ON T1.`id` = T2.`term_id`
-	WHERE
+        SELECT COUNT(*) INTO f_total
+        FROM (
+            SELECT T1.`id`
+            FROM 
+                term T1
+            INNER JOIN
+                subject_term T2 ON T1.`id` = T2.`term_id`
+            WHERE
 		T1.`term_type_id` = f_term_type_id
-	GROUP BY 
-	    T2.`subject_id`;
+            GROUP BY 
+                T2.`subject_id`
+        ) AS t;
 	
 	RETURN f_total;
 END $$
@@ -1312,7 +1341,7 @@ BEGIN
 	WHERE (
             date.`accession_id` = f_record_id
             AND
-            GetEnumValue(date.`date_type_id`) = f_date_type COLLATE utf8_general_ci )
+            GetEnumValue(date.`date_type_id`) = f_date_type)
         LIMIT 1;
 	
         -- return the part we need
@@ -1569,12 +1598,8 @@ BEGIN
 	WHERE date.`deaccession_id` = f_record_id 
         LIMIT 1;
 	
-        -- If the expression is null return then return the begin       
-        IF f_expression IS NULL THEN
-            SET f_value = f_begin;
-        ELSE
-            SET f_value = f_expression;
-        END IF;
+        -- Just return the date begin       
+        SET f_value = f_begin;
     
 	RETURN f_value;
 END $$
