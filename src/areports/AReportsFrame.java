@@ -197,7 +197,7 @@ public class AReportsFrame extends javax.swing.JFrame {
         jLabel12 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("aReports -- A Desktop Archivesspace Reports Engine (v0.2.3 04/02/2015)");
+        setTitle("aReports -- A Desktop Archivesspace Reports Engine (v0.2.4 04/22/2015)");
 
         closeButton.setText("Close");
         closeButton.addActionListener(new java.awt.event.ActionListener() {
