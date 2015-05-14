@@ -195,6 +195,7 @@ public class AReportsFrame extends javax.swing.JFrame {
         pushButton = new javax.swing.JButton();
         statusTextField = new javax.swing.JTextField();
         jLabel12 = new javax.swing.JLabel();
+        searchButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("aReports -- A Desktop Archivesspace Reports Engine (v0.2.4 04/22/2015)");
@@ -448,6 +449,13 @@ public class AReportsFrame extends javax.swing.JFrame {
 
         jLabel12.setText("Status");
 
+        searchButton.setText("Search");
+        searchButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                searchButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -460,6 +468,8 @@ public class AReportsFrame extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(disconnectButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(searchButton)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(pushButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(closeButton))
@@ -487,7 +497,8 @@ public class AReportsFrame extends javax.swing.JFrame {
                     .addComponent(closeButton)
                     .addComponent(connectButton)
                     .addComponent(disconnectButton)
-                    .addComponent(pushButton)))
+                    .addComponent(pushButton)
+                    .addComponent(searchButton)))
         );
 
         pack();
@@ -693,6 +704,18 @@ public class AReportsFrame extends javax.swing.JFrame {
             System.out.println("No Directry Selected");
         }
     }//GEN-LAST:event_browseButtonActionPerformed
+    
+    /**
+     * Display the search Frame
+     * @param evt 
+     */
+    private void searchButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchButtonActionPerformed
+        if(connection != null) {
+            SearchFrame searchFrame = new SearchFrame(connection);
+            searchFrame.setSize(600, 400);
+            searchFrame.setVisible(true);
+        }
+    }//GEN-LAST:event_searchButtonActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField aspaceDirectoryTextField;
@@ -727,6 +750,7 @@ public class AReportsFrame extends javax.swing.JFrame {
     private javax.swing.JComboBox reportsComboBox;
     private javax.swing.JTextField reportsDirectoryTextField;
     private javax.swing.JComboBox repositoryComboBox;
+    private javax.swing.JButton searchButton;
     private javax.swing.JTextField sftpHostTextField;
     private javax.swing.JPasswordField sftpPasswordField;
     private javax.swing.JTextField sftpUsernameTextField;
