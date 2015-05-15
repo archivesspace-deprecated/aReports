@@ -198,7 +198,7 @@ public class AReportsFrame extends javax.swing.JFrame {
         searchButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("aReports -- A Desktop Archivesspace Reports Engine (v0.3.0 05/15/2015)");
+        setTitle("aReports -- A Desktop Archivesspace Reports Engine (v0.3.1 05/15/2015)");
 
         closeButton.setText("Close");
         closeButton.addActionListener(new java.awt.event.ActionListener() {

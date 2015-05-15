@@ -31,7 +31,7 @@
 FROM
      `accession` accession
 WHERE
-     (accession.`repo_id` = $P{repositoryId} OR $P{repositoryId} = -1) ]]>
+     (accession.`repo_id` = $P{repositoryId} OR $P{repositoryId} = -1)]]>
 	</queryString>
 	<field name="accessionId" class="java.lang.Integer"/>
 	<field name="repo_id" class="java.lang.Integer">

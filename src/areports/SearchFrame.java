@@ -3,8 +3,30 @@
  */
 package areports;
 
+import areports.report.JRReturnScreen;
+import areports.utils.StringHelper;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.table.TableModel;
+import mondrian.tui.XmlaSupport;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.data.JRTableModelDataSource;
+import net.sf.jasperreports.engine.data.ListOfArrayDataSource;
+import net.sf.jasperreports.engine.design.JasperDesign;
+import net.sf.jasperreports.engine.xml.JRXmlLoader;
+import net.sf.jasperreports.view.JasperViewer;
+import org.apache.commons.lang3.StringUtils;
+import quick.dbtable.Column;
 import quick.dbtable.DBTable;
 
 /**
@@ -25,18 +47,12 @@ public class SearchFrame extends javax.swing.JFrame {
         
         // add a test sql select statement
         String testSQL = "SELECT\n"
-                + "     resource.`id` AS resourceId,\n"
-                + "     resource.`repo_id` AS repo_id,\n"
-                + "     resource.`title` AS title,\n"
-                + "     resource.`identifier` AS resourceIdentifier,\n"
-                + "     GetResourceCreator(resource.`id`) AS displayCreator,\n"
-                + "     GetEnumValueUF(resource.`language_id`) AS languageCode,\n"
-                + "     GetEnumValueUF(resource.`level_id`) AS level,\n"
-                + "     GetResourceDateExpression(resource.`id`) AS dateExpression,\n"
-                + "     GetResourceExtent(resource.`id`) AS extentNumber,\n"
-                + "     GetResourceExtentType(resource.`id`) AS extentType,\n"
-                + "     GetResourceContainerSummary(resource.`id`) As containerSummary,\n"
-                + "     resource.`restrictions` AS restrictionsApply\n"
+                + "     resource.`title` AS Title,\n"
+                + "     resource.`identifier` AS Identifier,\n"
+                + "     GetResourceDateExpression(resource.`id`) AS date,\n"
+                + "     GetResourceExtent(resource.`id`) AS Extent,\n"
+                + "     GetResourceExtentType(resource.`id`) AS 'Extent Type',\n"
+                + "     resource.`restrictions` AS Restrictions\n"
                 + "FROM\n"
                 + "     `resource` resource";
         
@@ -186,7 +202,30 @@ public class SearchFrame extends javax.swing.JFrame {
      * @param evt 
      */
     private void reportButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reportButtonActionPerformed
-        
+        try {
+            InputStream reportStream = this.getClass().getResourceAsStream("/areports/resources/returnScreen.jrxml");
+            
+            JasperDesign jasperDesign = JRXmlLoader.load(reportStream);
+            jasperDesign.setProperty("ReportTitle", "Print screen");
+            
+            JRReturnScreen returnScreen = new JRReturnScreen(jasperDesign, dBTable);
+            returnScreen.createHeaderAndDetail();
+            
+            // get the table model to pass to the report
+            TableModel tableModel = dBTable.getTable().getModel();
+            ListOfArrayDataSource listOfArrayDataSource = getListOfArrayDatasource();
+            
+            HashMap<String, Object> parameterMap = new HashMap<String, Object>();
+            parameterMap.put("ReportHeader", "Print Screen Test");
+            
+            JasperReport jasperReport = JasperCompileManager.compileReport(jasperDesign);
+            JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameterMap, listOfArrayDataSource);
+
+            JasperViewer jasperViewer = new JasperViewer(jasperPrint, false);
+            jasperViewer.setVisible(true);
+        } catch (JRException ex) {
+            Logger.getLogger(SearchFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_reportButtonActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -199,5 +238,60 @@ public class SearchFrame extends javax.swing.JFrame {
     private javax.swing.JButton searchButton;
     private javax.swing.JTextArea sqlSelectTextArea;
     // End of variables declaration//GEN-END:variables
+    
+    /**
+     * Method where the list of array data source is created
+     * 
+     * @return 
+     */
+    private ListOfArrayDataSource getListOfArrayDatasource() {
+        int numberOfColumns = dBTable.getColumnCount();
+        String[] columnNames = new String[numberOfColumns];
+        
+        for (int i = 0; i < numberOfColumns; i++) {
+            Column column = dBTable.getColumn(i);
+            columnNames[i] = column.getHeaderValue().toString();
+        }
+        
+        // get the record
+        List<Object[]> list = new ArrayList<Object[]>();
+        
+        Object[][] data = dBTable.getDataArray();
+        int numberOfRecords = data.length;
+        
+        for(int i = 0; i < numberOfRecords; i++) {
+            Object[] record = new Object[numberOfColumns];
+            for(int j = 0; j < numberOfColumns; j++) {
+                Object value = data[i][j];
+                if(value != null) {
+                    record[j] = cleanUpValue(value.toString());
+                } else {
+                    record[j] = "";
+                }
+            }
+            list.add(record);
+        } 
+        
+        ListOfArrayDataSource listOfArrayDataSource = new ListOfArrayDataSource(list, columnNames);
+        return listOfArrayDataSource;
+    }
+    
+    /**
+     * Method to clean up the value by removing tags etc
+     * 
+     * @param rawValue
+     * @return 
+     */
+    private String cleanUpValue(String rawValue) {
+        String value = "";
+        
+        if(rawValue.startsWith("[\"")) {
+            value = rawValue.replace("[", "").replace("]","").replace("\"","").replace(",null", "").replace(",", ".");
+        } else {
+            value = StringHelper.tagRemover(rawValue);
+        }
+        
+        return value;
+    }
 
 }
