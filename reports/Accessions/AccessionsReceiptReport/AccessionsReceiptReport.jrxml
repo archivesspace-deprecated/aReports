@@ -14,6 +14,9 @@
 	<parameter name="ReportHeader" class="java.lang.String" isForPrompting="false">
 		<defaultValueExpression><![CDATA[""]]></defaultValueExpression>
 	</parameter>
+	<parameter name="repositoryId" class="java.lang.Integer" isForPrompting="false">
+		<defaultValueExpression><![CDATA[2]]></defaultValueExpression>
+	</parameter>
 	<queryString>
 		<![CDATA[SELECT
      accession.`id` AS accessionId,
@@ -26,7 +29,9 @@
      GetAccessionExtent(accession.`id`) AS extentNumber,
      GetAccessionExtentType(accession.`id`) AS extentType
 FROM
-     `accession` accession]]>
+     `accession` accession
+WHERE
+     (accession.`repo_id` = $P{repositoryId} OR $P{repositoryId} = -1) ]]>
 	</queryString>
 	<field name="accessionId" class="java.lang.Integer"/>
 	<field name="repo_id" class="java.lang.Integer">

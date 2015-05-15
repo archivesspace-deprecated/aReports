@@ -104,8 +104,12 @@ public class NotesScriptlet extends JRDefaultScriptlet {
      */
     private void updateResourceNotesReport(JSONObject noteJS) throws JRScriptletException {
         String modelType = noteJS.getString("jsonmodel_type");
+     
+        // check to see we have a label, if not just return
+        if(!noteJS.has("label")) { return; }
+        
         setVariableValue("title", noteJS.getString("label"));
-
+        
         // set a default content for debugging
         String content = "";
 

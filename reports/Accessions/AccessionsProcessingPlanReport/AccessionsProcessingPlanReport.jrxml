@@ -14,6 +14,9 @@
 	<parameter name="ReportHeader" class="java.lang.String" isForPrompting="false">
 		<defaultValueExpression><![CDATA[""]]></defaultValueExpression>
 	</parameter>
+	<parameter name="repositoryId" class="java.lang.Integer" isForPrompting="false">
+		<defaultValueExpression><![CDATA[2]]></defaultValueExpression>
+	</parameter>
 	<queryString>
 		<![CDATA[SELECT
      T1.`id` AS accessionId,
@@ -33,7 +36,9 @@
 FROM
      `accession` T1
 LEFT OUTER JOIN
-     `collection_management` T2 ON T1.`id` = T2.`accession_id`]]>
+     `collection_management` T2 ON T1.`id` = T2.`accession_id`
+WHERE
+     (T1.`repo_id` = $P{repositoryId} OR $P{repositoryId} = -1)]]>
 	</queryString>
 	<field name="accessionId" class="java.lang.Integer"/>
 	<field name="repo_id" class="java.lang.Integer">

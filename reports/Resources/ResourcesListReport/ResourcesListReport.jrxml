@@ -6,13 +6,16 @@
 	<property name="ireport.encoding" value="UTF-8"/>
 	<property name="ireport.zoom" value="1.0"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="112"/>
+	<property name="ireport.y" value="81"/>
 	<import value="net.sf.jasperreports.engine.*"/>
 	<import value="java.util.*"/>
 	<import value="net.sf.jasperreports.engine.data.*"/>
 	<parameter name="basePath" class="java.lang.String"/>
 	<parameter name="ReportHeader" class="java.lang.String" isForPrompting="false">
 		<defaultValueExpression><![CDATA[""]]></defaultValueExpression>
+	</parameter>
+	<parameter name="repositoryId" class="java.lang.Integer" isForPrompting="false">
+		<defaultValueExpression><![CDATA[2]]></defaultValueExpression>
 	</parameter>
 	<queryString>
 		<![CDATA[SELECT
@@ -24,7 +27,9 @@
      GetResourceDateExpression(resource.`id`) AS dateExpression,
      GetResourceExtent(resource.`id`) AS extentNumber
 FROM
-     `resource` resource]]>
+     `resource` resource
+WHERE
+     (resource.`repo_id` = $P{repositoryId} OR $P{repositoryId} = -1)]]>
 	</queryString>
 	<field name="resourceId" class="java.lang.Integer"/>
 	<field name="repo_id" class="java.lang.Integer">

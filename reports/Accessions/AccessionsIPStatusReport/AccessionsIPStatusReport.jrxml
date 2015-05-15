@@ -6,7 +6,7 @@
 	<property name="ireport.encoding" value="UTF-8"/>
 	<property name="ireport.zoom" value="1.0"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="192"/>
+	<property name="ireport.y" value="223"/>
 	<import value="net.sf.jasperreports.engine.*"/>
 	<import value="java.util.*"/>
 	<import value="net.sf.jasperreports.engine.data.*"/>
@@ -15,6 +15,9 @@
 	</parameter>
 	<parameter name="ReportHeader" class="java.lang.String" isForPrompting="false">
 		<defaultValueExpression><![CDATA[""]]></defaultValueExpression>
+	</parameter>
+	<parameter name="repositoryId" class="java.lang.Integer" isForPrompting="false">
+		<defaultValueExpression><![CDATA[2]]></defaultValueExpression>
 	</parameter>
 	<queryString>
 		<![CDATA[SELECT
@@ -35,7 +38,9 @@
      GetAccessionRightsTransferred(accession.`id`) AS rightsTransferred,
      GetAccessionRightsTransferredNote(accession.`id`) AS rightsTransferredNote
 FROM
-     `accession` accession]]>
+     `accession` accession
+WHERE
+     (accession.`repo_id` = $P{repositoryId} OR $P{repositoryId} = -1)]]>
 	</queryString>
 	<field name="accessionId" class="java.lang.Integer"/>
 	<field name="repo_id" class="java.lang.Integer">

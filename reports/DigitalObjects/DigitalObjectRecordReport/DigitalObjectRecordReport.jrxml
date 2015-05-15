@@ -17,6 +17,9 @@
 		<defaultValueExpression><![CDATA["C:\\Program Files\\Archivists' Toolkit 1.7 (update 3)\\reports\\DigitalObjects\\"]]></defaultValueExpression>
 	</parameter>
 	<parameter name="basePath" class="java.lang.String"/>
+	<parameter name="repositoryId" class="java.lang.Integer" isForPrompting="false">
+		<defaultValueExpression><![CDATA[2]]></defaultValueExpression>
+	</parameter>
 	<queryString>
 		<![CDATA[SELECT
      T1.`id` AS digitalObjectId,
@@ -32,7 +35,9 @@
 FROM
      `digital_object` T1
 INNER JOIN
-     instance_do_link_rlshp T2 ON T1.`id` = T2.`digital_object_id`]]>
+     instance_do_link_rlshp T2 ON T1.`id` = T2.`digital_object_id`
+WHERE
+     (T1.`repo_id` = $P{repositoryId} OR $P{repositoryId} = -1) ]]>
 	</queryString>
 	<field name="digitalObjectId" class="java.lang.Integer"/>
 	<field name="repoId" class="java.lang.Integer"/>

@@ -198,7 +198,7 @@ public class AReportsFrame extends javax.swing.JFrame {
         searchButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("aReports -- A Desktop Archivesspace Reports Engine (v0.2.4 04/22/2015)");
+        setTitle("aReports -- A Desktop Archivesspace Reports Engine (v0.3.0 05/15/2015)");
 
         closeButton.setText("Close");
         closeButton.addActionListener(new java.awt.event.ActionListener() {
@@ -450,6 +450,7 @@ public class AReportsFrame extends javax.swing.JFrame {
         jLabel12.setText("Status");
 
         searchButton.setText("Search");
+        searchButton.setEnabled(false);
         searchButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 searchButtonActionPerformed(evt);
@@ -614,6 +615,7 @@ public class AReportsFrame extends javax.swing.JFrame {
             // update the UI components
             previewButton.setEnabled(true);
             disconnectButton.setEnabled(true);
+            searchButton.setEnabled(true);
             statusTextField.setText("Connected to Databae ...");
             
             // now load the repositories
@@ -634,6 +636,10 @@ public class AReportsFrame extends javax.swing.JFrame {
 
             //Print the data to the console
             repositoryComboBox.removeAllItems();
+            
+            // add a repository 
+            RepositoryInfo repositoryInfo = new RepositoryInfo(-1, "GLOBAL REPOSITORY (FOR TESTING)");
+            repositoryComboBox.addItem(repositoryInfo);
             
             while(result.next()){
                 int id = result.getInt("id");
@@ -712,7 +718,7 @@ public class AReportsFrame extends javax.swing.JFrame {
     private void searchButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchButtonActionPerformed
         if(connection != null) {
             SearchFrame searchFrame = new SearchFrame(connection);
-            searchFrame.setSize(600, 400);
+            searchFrame.setSize(800, 600);
             searchFrame.setVisible(true);
         }
     }//GEN-LAST:event_searchButtonActionPerformed

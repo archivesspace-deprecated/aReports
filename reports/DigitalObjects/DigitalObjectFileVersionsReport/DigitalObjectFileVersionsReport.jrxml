@@ -4,7 +4,7 @@
 	<property name="reportDescription" value="Displays any file versions associated with the selected digital objects."/>
 	<property name="ireport.zoom" value="1.0"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="75"/>
+	<property name="ireport.y" value="37"/>
 	<import value="net.sf.jasperreports.engine.*"/>
 	<import value="java.util.*"/>
 	<import value="net.sf.jasperreports.engine.data.*"/>
@@ -15,6 +15,9 @@
 	<parameter name="basePath" class="java.lang.String">
 		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
 	</parameter>
+	<parameter name="repositoryId" class="java.lang.Integer" isForPrompting="false">
+		<defaultValueExpression><![CDATA[2]]></defaultValueExpression>
+	</parameter>
 	<queryString>
 		<![CDATA[SELECT
      digital_object.`id` AS digitalObjectId,
@@ -22,7 +25,9 @@
      digital_object.`digital_object_id` AS identifier,
      digital_object.`repo_id` AS repoId
 FROM
-     `digital_object` digital_object]]>
+     `digital_object` digital_object
+WHERE
+     (digital_object.`repo_id` = $P{repositoryId} OR $P{repositoryId} = -1) ]]>
 	</queryString>
 	<field name="digitalObjectId" class="java.lang.Integer"/>
 	<field name="title" class="java.lang.String">

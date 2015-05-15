@@ -125,6 +125,7 @@ public class ReportUtils {
             }
         } catch (Exception ex) {
             Logger.getLogger(ReportUtils.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("File: " + file.getName());
         }
 
         // return the description
