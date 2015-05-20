@@ -49,7 +49,7 @@ public class SearchFrame extends javax.swing.JFrame {
         String testSQL = "SELECT\n"
                 + "     resource.`title` AS Title,\n"
                 + "     resource.`identifier` AS Identifier,\n"
-                + "     GetResourceDateExpression(resource.`id`) AS date,\n"
+                + "     GetResourceDateExpression(resource.`id`) AS Date,\n"
                 + "     GetResourceExtent(resource.`id`) AS Extent,\n"
                 + "     GetResourceExtentType(resource.`id`) AS 'Extent Type',\n"
                 + "     resource.`restrictions` AS Restrictions\n"

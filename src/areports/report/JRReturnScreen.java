@@ -28,38 +28,37 @@ public class JRReturnScreen {
         JRDesignBand columnHeaderBand = (JRDesignBand) designTemplate.getColumnHeader();
 
         JRDesignBand detailBand = (JRDesignBand) ((JRSection) designTemplate.getDetailSection()).getBands()[0];
-
+        
+        // get the total width of the JTable columns for calculating the column width
+        int[] columnWidths = getColumnWidths();
+        
         int numberOfColumns = dBTable.getColumnCount();
-        int columnWidth = WIDTH / numberOfColumns;
-
+        int xLocation = 0;
+        
         String fieldName;
-        Class columnClass;
         JRDesignField jrDesignField;
         JRDesignTextField textField;
         JRDesignExpression textFieldExpression;
-        JRDesignVariable jrDesignVariable;
-        JRDesignExpression variableExpression;
         
-       
+        
         for (int i = 0; i < numberOfColumns; i++) {
-            
             Column column = dBTable.getColumn(i);
             String columnName = column.getHeaderValue().toString();
-            
-            
+            int columnWidth = columnWidths[i] - 10;
+                    
             staticText = new JRDesignStaticText();
             staticText.setText(columnName);
-            staticText.setY(5);
-            staticText.setX(i * columnWidth);
-            staticText.setHeight(15);
+            staticText.setY(5);       
+            staticText.setX(xLocation);
             staticText.setWidth(columnWidth);
+            staticText.setHeight(15);
             staticText.setForecolor(Color.black);
             staticText.setBackcolor(Color.white);
             staticText.setBold(true);
             columnHeaderBand.addElement(staticText);
 
             fieldName = columnName;
-            
+
             jrDesignField = new JRDesignField();
             jrDesignField.setName(fieldName);
             jrDesignField.setValueClass(String.class);
@@ -70,14 +69,48 @@ public class JRReturnScreen {
             textFieldExpression.setText("$F{" + fieldName + "}");
             textField.setExpression(textFieldExpression);
             textField.setY(0);
-            textField.setX(i * columnWidth);
-            textField.setHeight(15);
+            textField.setX(xLocation);
             textField.setWidth(columnWidth);
+            textField.setHeight(15);
             textField.setStretchWithOverflow(true);
             textField.setForecolor(Color.black);
             textField.setBackcolor(Color.white);
             textField.setPrintRepeatedValues(true);
             detailBand.addElement(textField);
+            
+            // increment the xLocation variable
+            xLocation += columnWidths[i];
         }
+    }
+    
+    /**
+     * Get the column widths by doing two loops.
+     * 
+     * @return 
+     */
+    private int[] getColumnWidths() {
+        int numberOfColumns = dBTable.getColumnCount();
+        int columnWidths[] = new int[numberOfColumns];
+        
+        
+        System.out.println("Table Header: " + dBTable.getTableHeader().getWidth());
+        
+        // first loop find the total column widths
+        float totalWidth = 0;  
+        for (int i = 0; i < numberOfColumns; i++) {
+            Column column = dBTable.getColumn(i);
+            totalWidth += column.getWidth();
+        }
+        
+        // now figure out the column widths based on their percent in the jtable
+        for (int i = 0; i < numberOfColumns; i++) {
+            Column column = dBTable.getColumn(i);
+            float percent = column.getWidth()/totalWidth;
+            int width = (int) (percent * WIDTH);
+            columnWidths[i] = width;
+            System.out.println("Relative Column Width: " + width);
+        }
+        
+        return columnWidths;
     }
 }
