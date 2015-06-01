@@ -6,7 +6,7 @@
 	<property name="ireport.encoding" value="UTF-8"/>
 	<property name="ireport.zoom" value="1.0"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="192"/>
+	<property name="ireport.y" value="191"/>
 	<import value="net.sf.jasperreports.engine.*"/>
 	<import value="java.util.*"/>
 	<import value="net.sf.jasperreports.engine.data.*"/>
@@ -28,8 +28,8 @@
      T3.region AS contactRegion,
      T3.country AS contactCountry,
      T3.post_code AS contactMailCode,
-     T3.telephone AS contactPhone,
-     T3.fax AS contactFax,
+     GetPhoneNumber(T3.id) AS contactPhone,
+     GetFaxNumber(T3.id) AS contactFax,
      T3.email AS contactEmail
 FROM
      name_person T1
@@ -52,8 +52,8 @@ UNION
      T3.region AS contactRegion,
      T3.country AS contactCountry,
      T3.post_code AS contactMailCode,
-     T3.telephone AS contactPhone,
-     T3.fax AS contactFax,
+     GetPhoneNumber(T3.id) AS contactPhone,
+     GetFaxNumber(T3.id) AS contactFax,
      T3.email AS contactEmail
 FROM
      name_family T1
@@ -76,8 +76,8 @@ UNION
      T3.region AS contactRegion,
      T3.country AS contactCountry,
      T3.post_code AS contactMailCode,
-     T3.telephone AS contactPhone,
-     T3.fax AS contactFax,
+     GetPhoneNumber(T3.id) AS contactPhone,
+     GetFaxNumber(T3.id) AS contactFax,
      T3.email AS contactEmail
 FROM
      name_corporate_entity T1

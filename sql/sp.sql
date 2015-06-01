@@ -1657,3 +1657,55 @@ BEGIN
 END $$
 
 DELIMITER ;
+
+-- Function to return phone number given an agent contact id
+DROP FUNCTION IF EXISTS GetPhoneNumber;
+
+DELIMITER $$
+
+CREATE FUNCTION GetPhoneNumber(f_agent_contact_id INT) 
+	RETURNS VARCHAR(255)
+	READS SQL DATA
+BEGIN
+	DECLARE f_value VARCHAR(255);	
+	
+	SELECT 
+            telephone.`number`INTO f_value
+	FROM 
+            telephone
+	WHERE 
+            telephone.`agent_contact_id` = f_agent_contact_id
+            AND
+            GetEnumValue(telephone.`number_type_id`) != 'fax' COLLATE utf8_general_ci
+        LIMIT 1;
+	    
+	RETURN f_value;
+END $$
+
+DELIMITER ;
+
+-- Function to return fax number given an agent contact id
+DROP FUNCTION IF EXISTS GetFaxNumber;
+
+DELIMITER $$
+
+CREATE FUNCTION GetFaxNumber(f_agent_contact_id INT) 
+	RETURNS VARCHAR(255)
+	READS SQL DATA
+BEGIN
+	DECLARE f_value VARCHAR(255);	
+	
+	SELECT 
+            telephone.`number`INTO f_value
+	FROM 
+            telephone
+	WHERE 
+            telephone.`agent_contact_id` = f_agent_contact_id
+            AND
+            GetEnumValue(telephone.`number_type_id`) = 'fax' COLLATE utf8_general_ci
+        LIMIT 1;
+	    
+	RETURN f_value;
+END $$
+
+DELIMITER ;

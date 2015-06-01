@@ -25,8 +25,8 @@
      T3.region AS contactRegion,
      T3.country AS contactCountry,
      T3.post_code AS contactMailCode,
-     T3.telephone AS contactPhone,
-     T3.fax AS contactFax,
+     GetPhoneNumber(T3.id) AS contactPhone,
+     GetFaxNumber(T3.id) AS contactFax,
      T3.email AS contactEmail
 FROM
      `linked_agents_rlshp` T1
@@ -57,8 +57,8 @@ UNION
      T3.region AS contactRegion,
      T3.country AS contactCountry,
      T3.post_code AS contactMailCode,
-     T3.telephone AS contactPhone,
-     T3.fax AS contactFax,
+     GetPhoneNumber(T3.id) AS contactPhone,
+     GetFaxNumber(T3.id) AS contactFax,
      T3.email AS contactEmail
 FROM
      `linked_agents_rlshp` T1
@@ -89,8 +89,8 @@ UNION
      T3.region AS contactRegion,
      T3.country AS contactCountry,
      T3.post_code AS contactMailCode,
-     T3.telephone AS contactPhone,
-     T3.fax AS contactFax,
+     GetPhoneNumber(T3.id) AS contactPhone,
+     GetFaxNumber(T3.id) AS contactFax,
      T3.email AS contactEmail
 FROM
      `linked_agents_rlshp` T1
