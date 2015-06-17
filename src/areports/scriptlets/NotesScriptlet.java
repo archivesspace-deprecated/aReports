@@ -73,6 +73,9 @@ public class NotesScriptlet extends JRDefaultScriptlet {
      * @param noteJS
      */
     private void updateDigitalObjectNotesReport(JSONObject noteJS) throws JRScriptletException {
+        // check to see we have a label, if not just return
+        if(!noteJS.has("label")) { return; }
+        
         setVariableValue("type", noteJS.getString("type"));
         setVariableValue("title", noteJS.getString("label"));
 
@@ -103,10 +106,10 @@ public class NotesScriptlet extends JRDefaultScriptlet {
      * @param noteJS
      */
     private void updateResourceNotesReport(JSONObject noteJS) throws JRScriptletException {
-        String modelType = noteJS.getString("jsonmodel_type");
-     
         // check to see we have a label, if not just return
         if(!noteJS.has("label")) { return; }
+        
+        String modelType = noteJS.getString("jsonmodel_type");
         
         setVariableValue("title", noteJS.getString("label"));
         

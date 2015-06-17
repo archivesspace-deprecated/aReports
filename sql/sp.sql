@@ -194,7 +194,7 @@ BEGIN
 	FROM resource 
 	WHERE (resource.`repo_id` = f_repo_id
 	AND 
-	GetEnumValue(resource.`level_id`) = 'item' COLLATE utf8_general_ci);
+	BINARY GetEnumValue(resource.`level_id`) = BINARY 'item');
 	    
 	RETURN f_total;
 END $$
@@ -289,7 +289,7 @@ BEGIN
         AND
             T1.accession_id IS NOT NULL
 	AND 
-            GetEnumValue(T2.event_type_id) = 'processed' COLLATE utf8_general_ci);
+            BINARY GetEnumValue(T2.event_type_id) = BINARY 'processed');
 	    
 	RETURN f_total;
 END $$
@@ -315,7 +315,7 @@ BEGIN
 	WHERE 
             (T1.accession_id = f_accession_id  
 	AND 
-            GetEnumValue(T2.event_type_id) = 'processed' COLLATE utf8_general_ci);
+            BINARY GetEnumValue(T2.event_type_id) = BINARY 'processed');
 	    
 	RETURN GetBoolean(f_value);
 END $$
@@ -341,7 +341,7 @@ BEGIN
 	WHERE 
             (T1.accession_id = f_accession_id  
 	AND 
-            GetEnumValue(T2.event_type_id) = 'processed' COLLATE utf8_general_ci);
+            BINARY GetEnumValue(T2.event_type_id) = BINARY 'processed');
 	    
 	RETURN f_value;
 END $$
@@ -370,7 +370,7 @@ BEGIN
 	AND 
             T2.accession_id IS NOT NULL 
 	AND 
-            GetEnumValue(T1.event_type_id) = 'cataloged' COLLATE utf8_general_ci);
+            BINARY GetEnumValue(T1.event_type_id) = BINARY 'cataloged');
 	    
 	RETURN f_total;
 END $$
@@ -396,7 +396,7 @@ BEGIN
 	WHERE (
             T2.accession_id = f_accession_id 
 	AND 
-            GetEnumValue(T1.event_type_id) = 'cataloged' COLLATE utf8_general_ci)
+            BINARY GetEnumValue(T1.event_type_id) = BINARY 'cataloged')
         LIMIT 1;
 
 	RETURN GetBoolean(f_value);
@@ -423,7 +423,7 @@ BEGIN
 	WHERE 
             (T1.accession_id = f_accession_id  
 	AND 
-            GetEnumValue(T2.event_type_id) = 'cataloged' COLLATE utf8_general_ci);
+            BINARY GetEnumValue(T2.event_type_id) = BINARY 'cataloged');
 	    
 	RETURN f_value;
 END $$
@@ -475,7 +475,7 @@ BEGIN
 	AND 
             T2.accession_id IS NOT NULL 
 	AND 
-            GetEnumValue(T1.event_type_id) = 'rights_transferred' COLLATE utf8_general_ci);
+            BINARY GetEnumValue(T1.event_type_id) = BINARY 'rights_transferred');
 	    
 	RETURN f_total;
 END $$
@@ -501,7 +501,7 @@ BEGIN
 	WHERE 
             T2.accession_id = f_accession_id 
 	AND 
-            GetEnumValue(T1.event_type_id) = 'rights_transferred' COLLATE utf8_general_ci;
+            BINARY GetEnumValue(T1.event_type_id) = BINARY 'rights_transferred';
 	    
 	RETURN GetBoolean(f_value);
 END $$
@@ -527,7 +527,7 @@ BEGIN
 	WHERE 
             T2.accession_id = f_accession_id 
 	AND 
-            GetEnumValue(T1.event_type_id) = 'acknowledgement_sent' COLLATE utf8_general_ci;
+            BINARY GetEnumValue(T1.event_type_id) = BINARY 'acknowledgement_sent';
 	    
 	RETURN GetBoolean(f_value);
 END $$
@@ -553,7 +553,7 @@ BEGIN
 	WHERE 
             T2.accession_id = f_accession_id 
 	AND 
-            GetEnumValue(T1.event_type_id) = 'rights_transferred' COLLATE utf8_general_ci;
+            BINARY GetEnumValue(T1.event_type_id) = BINARY 'rights_transferred';
 
 	RETURN f_value;
 END $$
@@ -785,7 +785,7 @@ BEGIN
         WHERE
             GetResourceId(T1.`resource_id`, T1.`archival_object_id`) = f_record_id
         AND
-            GetEnumValue(T1.`role_id`) = 'creator' COLLATE utf8_general_ci
+            BINARY GetEnumValue(T1.`role_id`) = BINARY 'creator'
         LIMIT 1;
 
 	RETURN GetBoolean(f_value);
@@ -812,7 +812,7 @@ BEGIN
         WHERE
             GetResourceId(T1.`resource_id`, T1.`archival_object_id`) = f_record_id
         AND
-            GetEnumValue(T1.`role_id`) = 'creator' COLLATE utf8_general_ci;
+            BINARY GetEnumValue(T1.`role_id`) = BINARY 'creator';
 
 	RETURN f_value;
 END $$
@@ -838,7 +838,7 @@ BEGIN
         WHERE
             GetResourceId(T1.`resource_id`, T1.`archival_object_id`) = f_record_id
         AND
-            GetEnumValue(T1.`role_id`) = 'source' COLLATE utf8_general_ci
+            BINARY GetEnumValue(T1.`role_id`) = BINARY 'source' 
         LIMIT 1;
 
 	RETURN GetBoolean(f_value);
@@ -1676,7 +1676,7 @@ BEGIN
 	WHERE 
             telephone.`agent_contact_id` = f_agent_contact_id
             AND
-            GetEnumValue(telephone.`number_type_id`) != 'fax' COLLATE utf8_general_ci
+            BINARY GetEnumValue(telephone.`number_type_id`) != BINARY 'fax'
         LIMIT 1;
 	    
 	RETURN f_value;
@@ -1702,7 +1702,7 @@ BEGIN
 	WHERE 
             telephone.`agent_contact_id` = f_agent_contact_id
             AND
-            GetEnumValue(telephone.`number_type_id`) = 'fax' COLLATE utf8_general_ci
+            BINARY GetEnumValue(telephone.`number_type_id`) = BINARY 'fax'
         LIMIT 1;
 	    
 	RETURN f_value;
