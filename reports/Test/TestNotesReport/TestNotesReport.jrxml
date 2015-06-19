@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="TestNotesReport" pageWidth="612" pageHeight="792" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="be855b46-573a-4311-bac3-a0656f4cfe21">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="16"/>
+	<scriptlet name="NotesScriptlet" class="areports.scriptlets.NotesScriptlet"/>
+	<parameter name="reportName" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["NamesRecordReport"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[(SELECT
+     T1.id AS note_id,
+     CONVERT(T1.notes USING utf8) AS notesJSON,
+     T2.name AS contactName,
+     T2.address_1 AS contactAddress1,
+     T2.address_2 AS contactAddress2,
+     T2.city AS contactCity,
+     T2.region AS contactRegion,
+     T2.country AS contactCountry,
+     T2.post_code AS contactMailCode,
+     GetPhoneNumber(T2.id) AS contactPhone,
+     GetFaxNumber(T2.id) AS contactFax,
+     T2.email AS contactEmail
+FROM
+     `note` T1
+INNER JOIN
+     agent_contact T2 ON T1.agent_person_id = T2.agent_person_id
+WHERE
+     T1.agent_person_id IS NOT NULL
+)]]>
+	</queryString>
+	<field name="note_id" class="java.lang.Integer"/>
+	<field name="notesJSON" class="java.lang.String"/>
+	<field name="contactName" class="java.lang.String"/>
+	<field name="contactAddress1" class="java.lang.String"/>
+	<field name="contactAddress2" class="java.lang.String"/>
+	<field name="contactCity" class="java.lang.String"/>
+	<field name="contactRegion" class="java.lang.String"/>
+	<field name="contactCountry" class="java.lang.String"/>
+	<field name="contactMailCode" class="java.lang.String"/>
+	<field name="contactPhone" class="java.lang.String"/>
+	<field name="contactFax" class="java.lang.String"/>
+	<field name="contactEmail" class="java.lang.String"/>
+	<variable name="descriptionType" class="java.lang.String"/>
+	<variable name="descriptionNote" class="java.lang.String"/>
+	<variable name="citation" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="79" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="570" height="52" uuid="6ff8c716-6751-480b-9da1-b11045f8d7d3"/>
+				<textElement>
+					<font size="36" isBold="true" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Test JSON Notes]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="35" splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="61" splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="157" splitType="Stretch">
+			<textField>
+				<reportElement x="1" y="4" width="100" height="20" uuid="216974b2-1917-44d7-b60b-5afa452bd3f3"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{note_id}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement x="3" y="26" width="569" height="20" uuid="acfcaab8-d351-4207-a06b-f09c2509040c"/>
+				<textFieldExpression><![CDATA[$F{notesJSON}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="1" y="90" width="569" height="1" uuid="faa5b97f-6515-45a5-a36a-baf3c255a2cf"/>
+			</line>
+			<textField>
+				<reportElement x="1" y="91" width="569" height="20" uuid="6dab1888-dd34-47d1-aa8e-97d31c0d5286"/>
+				<textFieldExpression><![CDATA[$V{descriptionType}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="15" y="111" width="555" height="20" uuid="1a3cee03-9152-4219-a8e8-0e37baaa0b7f"/>
+				<textFieldExpression><![CDATA[$V{descriptionNote}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="15" y="131" width="536" height="20" uuid="866938fe-7c07-40ff-9faf-6641f188c6d8"/>
+				<textFieldExpression><![CDATA[$V{citation}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="45" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="54" splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>

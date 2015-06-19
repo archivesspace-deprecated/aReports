@@ -315,7 +315,8 @@ BEGIN
 	WHERE 
             (T1.accession_id = f_accession_id  
 	AND 
-            BINARY GetEnumValue(T2.event_type_id) = BINARY 'processed');
+            BINARY GetEnumValue(T2.event_type_id) = BINARY 'processed')
+        LIMIT 1;
 	    
 	RETURN GetBoolean(f_value);
 END $$
@@ -341,7 +342,8 @@ BEGIN
 	WHERE 
             (T1.accession_id = f_accession_id  
 	AND 
-            BINARY GetEnumValue(T2.event_type_id) = BINARY 'processed');
+            BINARY GetEnumValue(T2.event_type_id) = BINARY 'processed')
+        LIMIT 1;
 	    
 	RETURN f_value;
 END $$
@@ -370,7 +372,8 @@ BEGIN
 	AND 
             T2.accession_id IS NOT NULL 
 	AND 
-            BINARY GetEnumValue(T1.event_type_id) = BINARY 'cataloged');
+            BINARY GetEnumValue(T1.event_type_id) = BINARY 'cataloged')
+        LIMIT 1;
 	    
 	RETURN f_total;
 END $$
@@ -423,7 +426,8 @@ BEGIN
 	WHERE 
             (T1.accession_id = f_accession_id  
 	AND 
-            BINARY GetEnumValue(T2.event_type_id) = BINARY 'cataloged');
+            BINARY GetEnumValue(T2.event_type_id) = BINARY 'cataloged')
+        LIMIT 1;
 	    
 	RETURN f_value;
 END $$

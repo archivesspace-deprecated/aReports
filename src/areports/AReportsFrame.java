@@ -192,13 +192,14 @@ public class AReportsFrame extends javax.swing.JFrame {
         statusLabel = new javax.swing.JLabel();
         jLabel13 = new javax.swing.JLabel();
         repositoryComboBox = new javax.swing.JComboBox();
+        progressBar = new javax.swing.JProgressBar();
         pushButton = new javax.swing.JButton();
         statusTextField = new javax.swing.JTextField();
         jLabel12 = new javax.swing.JLabel();
         searchButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("aReports -- A Desktop Archivesspace Reports Engine (v0.3.3 06/17/2015)");
+        setTitle("aReports -- A Desktop Archivesspace Reports Engine (v0.3.4 06/18/2015)");
 
         closeButton.setText("Close");
         closeButton.addActionListener(new java.awt.event.ActionListener() {
@@ -396,14 +397,15 @@ public class AReportsFrame extends javax.swing.JFrame {
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jScrollPane1)
                             .addGroup(jPanel2Layout.createSequentialGroup()
-                                .addComponent(recordTypeComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(recordTypeComboBox, 0, 256, Short.MAX_VALUE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(reportsComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 304, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(jPanel2Layout.createSequentialGroup()
                                 .addComponent(jLabel11)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(statusLabel)
-                                .addGap(0, 0, Short.MAX_VALUE)))
+                                .addGap(0, 0, Short.MAX_VALUE))
+                            .addComponent(progressBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addContainerGap())))
         );
         jPanel2Layout.setVerticalGroup(
@@ -424,7 +426,7 @@ public class AReportsFrame extends javax.swing.JFrame {
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addComponent(jLabel10)
                         .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 94, Short.MAX_VALUE))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 112, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel11)
@@ -434,6 +436,8 @@ public class AReportsFrame extends javax.swing.JFrame {
                     .addComponent(previewButton)
                     .addComponent(jLabel13)
                     .addComponent(repositoryComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(progressBar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
 
@@ -488,8 +492,8 @@ public class AReportsFrame extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(statusTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel12, javax.swing.GroupLayout.PREFERRED_SIZE, 16, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -541,26 +545,47 @@ public class AReportsFrame extends javax.swing.JFrame {
             return;
         }
 
-        try {
-            HashMap<String, Object> parameterMap = new HashMap<String, Object>();
-            parameterMap.put("basePath", currentReportInfo.getParentDirectoryName());
-            
-            RepositoryInfo repositoryInfo = (RepositoryInfo)repositoryComboBox.getSelectedItem();
-            parameterMap.put("repositoryId", repositoryInfo.getRepositoryId());
-            
-            jasperReport = JasperCompileManager.compileReport(currentReportInfo.getFileName());
-            jasperPrint = JasperFillManager.fillReport(jasperReport, parameterMap, connection);
+        // create thread to actual process the report
+        previewButton.setEnabled(false);
 
-            JasperViewer jasperViewer = new JasperViewer(jasperPrint, false);
-            jasperViewer.setVisible(true);
-        } catch (JRException ex) {
-            JOptionPane.showMessageDialog(this,
-                    ex.getMessage(),
-                    "Jasper Report Error",
-                    JOptionPane.ERROR_MESSAGE);
+        // start the progress bar going
+        progressBar.setIndeterminate(true);
+        progressBar.setStringPainted(true);
+        progressBar.setString("Loading Data For Report ...");
 
-            Logger.getLogger(AReportsFrame.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        Thread previewThread = new Thread("Preview Thread") {
+
+            @Override
+            public void run() {
+                try {
+                    HashMap<String, Object> parameterMap = new HashMap<String, Object>();
+                    parameterMap.put("basePath", currentReportInfo.getParentDirectoryName());
+
+                    RepositoryInfo repositoryInfo = (RepositoryInfo) repositoryComboBox.getSelectedItem();
+                    parameterMap.put("repositoryId", repositoryInfo.getRepositoryId());
+
+                    jasperReport = JasperCompileManager.compileReport(currentReportInfo.getFileName());
+                    jasperPrint = JasperFillManager.fillReport(jasperReport, parameterMap, connection);
+
+                    JasperViewer jasperViewer = new JasperViewer(jasperPrint, false);
+                    jasperViewer.setVisible(true);
+                } catch (JRException ex) {
+                    JOptionPane.showMessageDialog(null,
+                            ex.getMessage(),
+                            "Jasper Report Error",
+                            JOptionPane.ERROR_MESSAGE);
+
+                    Logger.getLogger(AReportsFrame.class.getName()).log(Level.SEVERE, null, ex);
+                }
+
+                // stop the progress bar and make the preview button active again
+                progressBar.setIndeterminate(false);
+                progressBar.setStringPainted(false);
+                previewButton.setEnabled(true);
+            }
+        };
+
+        previewThread.start();
     }//GEN-LAST:event_previewButtonActionPerformed
 
     /**
@@ -750,6 +775,7 @@ public class AReportsFrame extends javax.swing.JFrame {
     private javax.swing.JTextField jdbcURLTextField;
     private javax.swing.JTextField jdbcUsernameTextField;
     private javax.swing.JButton previewButton;
+    private javax.swing.JProgressBar progressBar;
     private javax.swing.JButton pushButton;
     private javax.swing.JComboBox recordTypeComboBox;
     private javax.swing.JTextArea reportDescriptionTextArea;
