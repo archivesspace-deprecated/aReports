@@ -1,7 +1,13 @@
 aReports
 ============
 
-A Small Java Utility Program for testing and generating the configuration files for Archivesspace Reports.
+The code in this repository has two targets:
+
+1) A Small Java Desktop Program for testing and generating the configuration files for Archivesspace Reports.
+
+2) A JAR file to be included in archivesspace/common/lib to support running reports in ArchivesSpace
+
+## Desktop 
 
 Since the program works by connecting directly to the Archivesspace MySQL backend database, MySQL access is need from the computer it runs on.  
 
@@ -27,5 +33,15 @@ The program also has the ability to generate the needed configuration files and 
 3. By default, the JDBC connection information for a tracer database is provided for testing purposes.
 4. For MySQL you may need to set the `thread_stack` value to 256k in `my.cnf` (requires restart).
 5. On Ubuntu (Debian) a non-headless jre is required, as well as [additional fonts](http://www.perfectabstractions.com/blog/how-to-install-windows-fonts-in-java-on-linux).
+
+## ASpace JAR
+
+Run this ant task:
+
+    ant build-aspace-jar
+
+Copy the file to archivesspace and check it in:
+
+    cp dist/areports-aspace.jar {ASpace Project Directory}/common/lib
 
 ---
