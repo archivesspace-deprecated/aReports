@@ -49,7 +49,11 @@ public class NotesScriptlet extends JRDefaultScriptlet {
      * @throws JRScriptletException
      */
     private void updateNamesRecordReport(JSONObject noteJS) throws JRScriptletException {
-        setVariableValue("descriptionType", noteJS.getString("label"));
+        if(noteJS.has("label")) {
+            setVariableValue("descriptionType", noteJS.getString("label"));
+        } else {
+            setVariableValue("descriptionType", "Unlabeled");
+        }
 
         JSONArray subnotesJA = noteJS.getJSONArray("subnotes");
 
