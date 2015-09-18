@@ -5,14 +5,20 @@ package areports;
 
 import areports.report.JRReturnScreen;
 import areports.utils.StringHelper;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import javax.swing.table.TableModel;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperCompileManager;
@@ -31,8 +37,14 @@ import quick.dbtable.DBTable;
  * @author nathan
  */
 public class SearchFrame extends javax.swing.JFrame {
-
+    // table component for dsiplaying results from SQL calls
     private DBTable dBTable;
+    
+    // this just store the sql calls from the jasper reports
+    private TreeMap<String, String> sqlTreeMap;
+    
+    // used for saving files
+    private final JFileChooser fc = new JFileChooser();
 
     /**
      * Creates new form SearchFrame
@@ -54,6 +66,18 @@ public class SearchFrame extends javax.swing.JFrame {
                 + "     `resource` resource";
         
         sqlSelectTextArea.setText(testSQL);
+    }
+    
+    /**
+     * Method to add the reports names to the drop down list, along with a map for the sql
+     * @param sqlTreeMap 
+     */
+    public void setReportsSQLTreeMap(TreeMap<String, String> sqlTreeMap) {
+        this.sqlTreeMap = sqlTreeMap;
+        
+        for(String filename: sqlTreeMap.keySet()) {
+            reportsComboBox.addItem(filename);
+        }
     }
 
     /**
@@ -78,9 +102,14 @@ public class SearchFrame extends javax.swing.JFrame {
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
-        closeButton = new javax.swing.JButton();
+        jPanel4 = new javax.swing.JPanel();
+        reportsComboBox = new javax.swing.JComboBox();
+        jPanel3 = new javax.swing.JPanel();
         searchButton = new javax.swing.JButton();
         reportButton = new javax.swing.JButton();
+        tsvExportButton = new javax.swing.JButton();
+        htmlExportButton = new javax.swing.JButton();
+        closeButton = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -89,12 +118,19 @@ public class SearchFrame extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Search Form");
 
-        closeButton.setText("Close");
-        closeButton.addActionListener(new java.awt.event.ActionListener() {
+        jPanel1.setLayout(new java.awt.GridLayout(2, 1));
+
+        jPanel4.setLayout(new java.awt.GridLayout());
+
+        reportsComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Select Jasper Report" }));
+        reportsComboBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                closeButtonActionPerformed(evt);
+                reportsComboBoxActionPerformed(evt);
             }
         });
+        jPanel4.add(reportsComboBox);
+
+        jPanel1.add(jPanel4);
 
         searchButton.setText("Search");
         searchButton.addActionListener(new java.awt.event.ActionListener() {
@@ -110,26 +146,58 @@ public class SearchFrame extends javax.swing.JFrame {
             }
         });
 
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
+        tsvExportButton.setText("TSV Export");
+        tsvExportButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                tsvExportButtonActionPerformed(evt);
+            }
+        });
+
+        htmlExportButton.setText("HTML Table Export");
+        htmlExportButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                htmlExportButtonActionPerformed(evt);
+            }
+        });
+
+        closeButton.setText("Close");
+        closeButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                closeButtonActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
+        jPanel3.setLayout(jPanel3Layout);
+        jPanel3Layout.setHorizontalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addContainerGap()
                 .addComponent(searchButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(reportButton)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 482, Short.MAX_VALUE)
-                .addComponent(closeButton))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(tsvExportButton)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(htmlExportButton)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 464, Short.MAX_VALUE)
+                .addComponent(closeButton)
+                .addContainerGap())
         );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
+        jPanel3Layout.setVerticalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
                 .addGap(5, 5, 5)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(closeButton)
-                    .addComponent(searchButton)
-                    .addComponent(reportButton)))
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(reportButton)
+                        .addComponent(searchButton)
+                        .addComponent(tsvExportButton)
+                        .addComponent(htmlExportButton))
+                    .addComponent(closeButton)))
         );
+
+        jPanel1.add(jPanel3);
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.PAGE_END);
 
@@ -138,7 +206,7 @@ public class SearchFrame extends javax.swing.JFrame {
         jLabel1.setVerticalTextPosition(javax.swing.SwingConstants.TOP);
 
         sqlSelectTextArea.setColumns(20);
-        sqlSelectTextArea.setRows(5);
+        sqlSelectTextArea.setRows(15);
         jScrollPane1.setViewportView(sqlSelectTextArea);
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
@@ -149,7 +217,7 @@ public class SearchFrame extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 732, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 1013, Short.MAX_VALUE)
                 .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
@@ -159,10 +227,8 @@ public class SearchFrame extends javax.swing.JFrame {
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addComponent(jLabel1)
-                        .addGap(68, 68, 68))
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addComponent(jScrollPane1)
-                        .addContainerGap())))
+                        .addContainerGap(147, Short.MAX_VALUE))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)))
         );
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.PAGE_START);
@@ -183,16 +249,18 @@ public class SearchFrame extends javax.swing.JFrame {
      * Method used to run the select statement
      * @param evt 
      */
-    private void searchButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchButtonActionPerformed
+    private void searchButtonActionPerformed(java.awt.event.ActionEvent evt) {                                             
         dBTable.setSelectSql(sqlSelectTextArea.getText());
-
+    
         try {
-            //fetch the data from database to fill the table
-            dBTable.refresh();
+            dBTable.refresh();  // this just runs the SQL command
         } catch (SQLException e) {
-            e.printStackTrace();
+            JOptionPane.showMessageDialog(this,
+            "<html><body><p style='width: 200px;'>"+ e.toString() + "</p></body></html>", 
+            "SQL Error", JOptionPane.ERROR_MESSAGE);
+            System.out.println("\n***\n" + e.toString());
         }
-    }//GEN-LAST:event_searchButtonActionPerformed
+    }                                            
     
     /**
      * Method to do a sprint screen report
@@ -224,16 +292,113 @@ public class SearchFrame extends javax.swing.JFrame {
             Logger.getLogger(SearchFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_reportButtonActionPerformed
+    
+    /**
+     * Method to export the data in the table as tsv file
+     * 
+     * @param evt 
+     */
+    private void tsvExportButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tsvExportButtonActionPerformed
+        StringBuilder sb = new StringBuilder();
+        
+        // get the column names
+        String[] columnNames = getColumnNames();
+        int numberOfColumns = columnNames.length;
+        
+        for (int j = 0; j < numberOfColumns; j++) {
+            String value = columnNames[j];
+            
+            if (j != (numberOfColumns - 1)) {
+                sb.append(value).append("\t");
+            } else {
+                sb.append(value).append("\n");
+            }
+        }
+        
+        // get all the records and place them in buffer
+        Object[][] data = dBTable.getDataArray();
+        int numberOfRecords = data.length;
+        
+        for(int i = 0; i < numberOfRecords; i++) {
+            for(int j = 0; j < numberOfColumns; j++) {
+                String value = "";
+                Object object = data[i][j];
+                if(object != null) {
+                    value = cleanUpValue(object.toString());
+                }
+                
+                if(j != (numberOfColumns - 1)) {
+                    sb.append(value).append("\t");
+                } else {
+                    sb.append(value).append("\n");
+                }
+            }
+        }
+        
+        // now save the text file
+        saveTextToFile(sb.toString(), "tsv");
+    }//GEN-LAST:event_tsvExportButtonActionPerformed
+    
+    /**
+     * 
+     * @param text 
+     */
+    private void saveTextToFile(String text, String ext) {
+        File file = new File("results." + ext);
+        fc.setSelectedFile(file);
+        
+        int returnVal = fc.showSaveDialog(this);
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            file = fc.getSelectedFile();
+            
+            PrintWriter out = null;
+            try {
+                out = new PrintWriter(file);
+                out.println(text);
+            } catch (FileNotFoundException ex) {
+                Logger.getLogger(SearchFrame.class.getName()).log(Level.SEVERE, null, ex);
+            } finally {
+                if(out != null) {
+                    out.close();
+                }
+            }
+        }
+    } 
+    
+    private void htmlExportButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_htmlExportButtonActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_htmlExportButtonActionPerformed
+
+//GEN-FIRST:event_searchButtonActionPerformed
+ 
+//GEN-LAST:event_searchButtonActionPerformed
+    /**
+     * Method to select the sql string for particular report and display
+     * @param evt 
+     */
+    private void reportsComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reportsComboBoxActionPerformed
+        String key = reportsComboBox.getSelectedItem().toString();
+        
+        if(sqlTreeMap.containsKey(key)) {
+            String sqlString = sqlTreeMap.get(key);
+            sqlSelectTextArea.setText(sqlString);
+        }
+    }//GEN-LAST:event_reportsComboBoxActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton closeButton;
+    private javax.swing.JButton htmlExportButton;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JButton reportButton;
+    private javax.swing.JComboBox reportsComboBox;
     private javax.swing.JButton searchButton;
     private javax.swing.JTextArea sqlSelectTextArea;
+    private javax.swing.JButton tsvExportButton;
     // End of variables declaration//GEN-END:variables
     
     /**
@@ -242,13 +407,8 @@ public class SearchFrame extends javax.swing.JFrame {
      * @return 
      */
     private ListOfArrayDataSource getListOfArrayDatasource() {
-        int numberOfColumns = dBTable.getColumnCount();
-        String[] columnNames = new String[numberOfColumns];
-        
-        for (int i = 0; i < numberOfColumns; i++) {
-            Column column = dBTable.getColumn(i);
-            columnNames[i] = column.getHeaderValue().toString();
-        }
+        String[] columnNames = getColumnNames();
+        int numberOfColumns = columnNames.length;
         
         // get the record
         List<Object[]> list = new ArrayList<Object[]>();
@@ -271,6 +431,23 @@ public class SearchFrame extends javax.swing.JFrame {
         
         ListOfArrayDataSource listOfArrayDataSource = new ListOfArrayDataSource(list, columnNames);
         return listOfArrayDataSource;
+    }
+    
+    /**
+     * Method to get the column names and return as string array
+     * 
+     * @return 
+     */
+    private String[] getColumnNames() {
+        int numberOfColumns = dBTable.getColumnCount();
+        String[] columnNames = new String[numberOfColumns];
+        
+        for (int i = 0; i < numberOfColumns; i++) {
+            Column column = dBTable.getColumn(i);
+            columnNames[i] = column.getHeaderValue().toString();
+        }
+        
+        return columnNames;
     }
     
     /**

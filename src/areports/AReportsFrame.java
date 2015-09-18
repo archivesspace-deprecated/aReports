@@ -54,6 +54,9 @@ public class AReportsFrame extends javax.swing.JFrame {
 
     private File reportsDirectory;
     
+    // this stores all the sql for the reports and sub reports
+    private TreeMap<String, String> sqlTreeMap = new TreeMap<String, String>();
+    
     /**
      * Creates new form AReportsFrame
      */
@@ -136,7 +139,7 @@ public class AReportsFrame extends javax.swing.JFrame {
      * Method to set the map containing the reports file
      */
     public void loadReportsMap() {
-        this.reportsMap = ReportUtils.findJasperReports(reportsDirectory, null, null);
+        this.reportsMap = ReportUtils.findJasperReports(reportsDirectory, null, null, sqlTreeMap);
 
         // now update the User interface components
         recordTypeComboBox.removeAllItems();
@@ -199,7 +202,7 @@ public class AReportsFrame extends javax.swing.JFrame {
         searchButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("aReports -- A Desktop Archivesspace Reports Engine (v0.3.4 06/18/2015)");
+        setTitle("aReports -- A Desktop Archivesspace Reports Engine (v0.4.0 09/18/2015)");
 
         closeButton.setText("Close");
         closeButton.addActionListener(new java.awt.event.ActionListener() {
@@ -743,7 +746,8 @@ public class AReportsFrame extends javax.swing.JFrame {
     private void searchButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchButtonActionPerformed
         if(connection != null) {
             SearchFrame searchFrame = new SearchFrame(connection);
-            searchFrame.setSize(800, 600);
+            searchFrame.setSize(800, 700);
+            searchFrame.setReportsSQLTreeMap(sqlTreeMap);
             searchFrame.setVisible(true);
         }
     }//GEN-LAST:event_searchButtonActionPerformed

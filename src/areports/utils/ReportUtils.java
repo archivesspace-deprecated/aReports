@@ -20,6 +20,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.apache.commons.io.FileUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
@@ -43,12 +44,17 @@ public class ReportUtils {
      * @return HashMap containing
      */
     public static TreeMap<String, Set<JasperReportInfo>> findJasperReports(File dir, String reportsDir,
-            TreeMap<String, Set<JasperReportInfo>> reportsMap) {
+            TreeMap<String, Set<JasperReportInfo>> reportsMap, TreeMap<String, String> sqlTreeMap) {
 
         // initialize the reports map if needed
         if (reportsMap == null) {
             reportsMap = new TreeMap<String, Set<JasperReportInfo>>();
             reportsDir = dir.getAbsolutePath();
+        }
+        
+        // initialize the reports sql map which just store the sql commands
+        if(sqlTreeMap == null) {
+            sqlTreeMap = new TreeMap<String, String>();
         }
 
         File[] files = dir.listFiles();
@@ -68,13 +74,19 @@ public class ReportUtils {
                 reportsMap.put(key, reportsSet);
 
                 // make a recursive call
-                findJasperReports(file, reportsDir, reportsMap);
+                findJasperReports(file, reportsDir, reportsMap, sqlTreeMap);
             } else {
                 if (fileName.endsWith(".jrxml")) {
-                    if (fileName.startsWith("sub_") || fileName.contains("_sub")) {
-                        //System.out.println("Sub-Report\t-- " + fileName);
-                    } else {
-                        String key = file.getParent().replace(reportsDir, "");
+                    String key = file.getParent().replace(reportsDir, "");
+                    String sqlKey = key + File.separator + fileName;
+                    
+                    // store the sql for this report or sub report
+                    String reportSQL = getReportSQL(file);
+                    if(reportSQL != null) {
+                        sqlTreeMap.put(sqlKey, reportSQL);
+                    }
+                    
+                    if (!fileName.startsWith("sub_") && !fileName.contains("_sub")) {
                         Set<JasperReportInfo> reportsSet = reportsMap.get(key);
 
                         String reportName = fileName.replace(".jrxml", "");
@@ -130,6 +142,33 @@ public class ReportUtils {
 
         // return the description
         return description;
+    }
+    
+    /**
+     * Method to read the description information from a jasper report file
+     *
+     * @param file
+     * @return
+     */
+    private static String getReportSQL(File file) {
+        try {
+            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+            Document doc = dBuilder.parse(file);
+
+            //optional, but recommended
+            //read this - http://stackoverflow.com/questions/13786607/normalization-in-dom-parsing-with-java-how-does-it-work
+            doc.getDocumentElement().normalize();
+
+            NodeList nList = doc.getElementsByTagName("queryString");
+            Element element = (Element) nList.item(0);
+            Node child = element.getFirstChild().getNextSibling();
+            String sqlString = child.getNodeValue();
+            
+            return sqlString;
+        } catch (Exception ex) {
+            return null;
+        }
     }
 
     /**
