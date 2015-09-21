@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+This files contains Queries designed to extract data from the ASpace backend
+-->
+
+
+<root>
+    <!--
+    This query 01 which just list the subjects
+    -->
+    <queryString name="01 Test Query">
+		<![CDATA[
+SELECT
+     subject.`id` AS subject_id,
+     subject.`title` AS subject_title,
+     GetTermType(subject.`id`) AS subject_term_type,
+     enumeration_value.`value` AS subject_source
+FROM
+     subject
+INNER JOIN
+     enumeration_value
+	ON subject.`source_id` = enumeration_value.`id`
+]]>
+    </queryString>
+    
+    <!--
+    This query 01 which just list the subjects
+    -->
+    <queryString name="02 Test Query">
+		<![CDATA[
+SELECT
+     subject.`id` AS subject_id,
+     subject.`title` AS subject_title,
+     GetTermType(subject.`id`) AS subject_term_type,
+     enumeration_value.`value` AS subject_source
+FROM
+     subject
+INNER JOIN
+     enumeration_value
+	ON subject.`source_id` = enumeration_value.`id`
+]]>
+    </queryString>    
+    
+</root>

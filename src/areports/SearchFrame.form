@@ -47,7 +47,7 @@
               <Properties>
                 <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
                   <StringArray count="1">
-                    <StringItem index="0" value="Select Jasper Report"/>
+                    <StringItem index="0" value="Select Jasper Report Query or Loaded Query"/>
                   </StringArray>
                 </Property>
               </Properties>
@@ -71,7 +71,9 @@
                       <Component id="tsvExportButton" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="htmlExportButton" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="464" max="32767" attributes="0"/>
+                      <EmptySpace pref="342" max="32767" attributes="0"/>
+                      <Component id="loadSQLButton" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
                       <Component id="closeButton" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
@@ -88,7 +90,10 @@
                               <Component id="tsvExportButton" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="htmlExportButton" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <Component id="closeButton" min="-2" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="closeButton" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="loadSQLButton" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
                       </Group>
                   </Group>
               </Group>
@@ -121,7 +126,7 @@
             </Component>
             <Component class="javax.swing.JButton" name="htmlExportButton">
               <Properties>
-                <Property name="text" type="java.lang.String" value="HTML Table Export"/>
+                <Property name="text" type="java.lang.String" value="HTML Export"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="htmlExportButtonActionPerformed"/>
@@ -133,6 +138,14 @@
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="closeButtonActionPerformed"/>
+              </Events>
+            </Component>
+            <Component class="javax.swing.JButton" name="loadSQLButton">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Load SQL Queries"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="loadSQLButtonActionPerformed"/>
               </Events>
             </Component>
           </SubComponents>
@@ -163,12 +176,10 @@
               <Group type="102" alignment="0" attributes="0">
                   <EmptySpace min="5" pref="5" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Group type="102" attributes="0">
-                          <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="147" max="32767" attributes="0"/>
-                      </Group>
-                      <Component id="jScrollPane1" pref="0" max="32767" attributes="0"/>
+                      <Component id="jScrollPane1" min="-2" pref="185" max="-2" attributes="0"/>
+                      <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
                   </Group>
+                  <EmptySpace max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>

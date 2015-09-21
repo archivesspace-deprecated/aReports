@@ -746,7 +746,7 @@ public class AReportsFrame extends javax.swing.JFrame {
     private void searchButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchButtonActionPerformed
         if(connection != null) {
             SearchFrame searchFrame = new SearchFrame(connection);
-            searchFrame.setSize(800, 700);
+            searchFrame.setSize(900, 700);
             searchFrame.setReportsSQLTreeMap(sqlTreeMap);
             searchFrame.setVisible(true);
         }

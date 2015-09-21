@@ -170,6 +170,37 @@ public class ReportUtils {
             return null;
         }
     }
+    
+    /**
+     * Method to load reports into a tree map from an xml file
+     * 
+     * @param file
+     * @return 
+     * @throws java.lang.Exception 
+     */
+    public static TreeMap<String, String> getSQLTreeMap(File file) throws Exception {
+        TreeMap<String, String> sqlTreeMap = new TreeMap<String, String>();
+        
+        DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+        Document doc = dBuilder.parse(file);
+
+        //optional, but recommended
+        //read this - http://stackoverflow.com/questions/13786607/normalization-in-dom-parsing-with-java-how-does-it-work
+        doc.getDocumentElement().normalize();
+
+        NodeList nList = doc.getElementsByTagName("queryString");
+        for (int i = 0; i < nList.getLength(); i++) {
+            Element element = (Element) nList.item(i);
+            Node child = element.getFirstChild().getNextSibling();
+
+            String name = element.getAttribute("name");
+            String sqlString = child.getNodeValue();
+            sqlTreeMap.put(name, sqlString);
+        }
+        
+        return sqlTreeMap;
+    }
 
     /**
      * Method to save the ASpace report model to a file
