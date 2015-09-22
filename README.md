@@ -26,6 +26,17 @@ The program also has the ability to generate the needed configuration files and 
 1. Enter the sFTP information, including the remote directory where Archivesspace is installed.
 2. Press the Push button to generate the configuration file, and copy all compiled reports/subreports to the remote Archivesspace reports directory. 
 
+#####Searching
+As of version 0.4.0 there is now a simple dialog to allow searching of the connected Archivesspace database using SQL queries. The results of these queries can then be sent to a Jasper Report, or saved in various formats (*.tsv, *.html, *.xls).  By default he queries from the Jasper reports are made available via a drop-down, but additional queries can be entered directly, or loaded from an xml file. See https://github.com/archivesspace/aReports/blob/master/sql/sampleQueries.xml for the format of this file. 
+
+To use search functionality:
+
+1. Connect to the desired Archivesspace database from the main program window.
+2. Press the "Search" button to bring up the search window.
+3. Enter or sql query, or use the drop down menu to select one from one of the Jasper reports or one loaded from xml file. Please note that many of the queries from the Jasper reports need to be modified inorder to run without errors.
+4. Press the "Search" button to retrive the results. The results can then be saved in the desired format using the appropriate button. 
+
+
 ####Notes
 
 1. On Windows 7/8 there is a bug in Java which prevents program information from being stored. Follow the instructions at http://stackoverflow.com/questions/16428098/groovy-shell-warning-could-not-open-create-prefs-root-node
