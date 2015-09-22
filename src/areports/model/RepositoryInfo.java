@@ -33,6 +33,6 @@ public class RepositoryInfo {
     
     @Override
     public String toString() {
-        return repositoryName;
+        return repositoryName + " [" + repositoryId + "]";
     }
 }

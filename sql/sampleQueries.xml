@@ -24,7 +24,7 @@ INNER JOIN
     </queryString>
     
     <!--
-    This query 01 which just list the subjects
+    This query 02 which just list the subjects
     -->
     <queryString name="02 Test Query">
 		<![CDATA[

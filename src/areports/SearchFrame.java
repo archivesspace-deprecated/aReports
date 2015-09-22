@@ -8,6 +8,8 @@ import areports.utils.ReportUtils;
 import areports.utils.StringHelper;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.sql.Connection;
@@ -30,6 +32,15 @@ import net.sf.jasperreports.engine.data.ListOfArrayDataSource;
 import net.sf.jasperreports.engine.design.JasperDesign;
 import net.sf.jasperreports.engine.xml.JRXmlLoader;
 import net.sf.jasperreports.view.JasperViewer;
+import org.apache.poi.hssf.usermodel.HSSFCellStyle;
+import org.apache.poi.hssf.usermodel.HSSFFont;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 import quick.dbtable.Column;
 import quick.dbtable.DBTable;
 
@@ -115,6 +126,7 @@ public class SearchFrame extends javax.swing.JFrame {
         htmlExportButton = new javax.swing.JButton();
         closeButton = new javax.swing.JButton();
         loadSQLButton = new javax.swing.JButton();
+        excelExportButton = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -179,6 +191,13 @@ public class SearchFrame extends javax.swing.JFrame {
             }
         });
 
+        excelExportButton.setText("XLS Export");
+        excelExportButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                excelExportButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
@@ -192,7 +211,9 @@ public class SearchFrame extends javax.swing.JFrame {
                 .addComponent(tsvExportButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(htmlExportButton)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 342, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(excelExportButton)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 225, Short.MAX_VALUE)
                 .addComponent(loadSQLButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(closeButton)
@@ -207,7 +228,8 @@ public class SearchFrame extends javax.swing.JFrame {
                         .addComponent(reportButton)
                         .addComponent(searchButton)
                         .addComponent(tsvExportButton)
-                        .addComponent(htmlExportButton))
+                        .addComponent(htmlExportButton)
+                        .addComponent(excelExportButton))
                     .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(closeButton)
                         .addComponent(loadSQLButton))))
@@ -379,7 +401,37 @@ public class SearchFrame extends javax.swing.JFrame {
                 }
             }
         }
-    } 
+    }
+    
+    /**
+     * Method to save the search results as an excel workbook
+     * 
+     * @param wb 
+     */
+    private void saveExcelWorkbookToFile(Workbook wb) {
+        File file = new File("results.xls");
+        fc.setSelectedFile(file);
+        
+        int returnVal = fc.showSaveDialog(this);
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            FileOutputStream fileOut = null;
+            
+            try {
+                file = fc.getSelectedFile();
+                fileOut = new FileOutputStream(file);
+                wb.write(fileOut);
+                fileOut.close();
+            } catch (Exception ex) {
+                Logger.getLogger(SearchFrame.class.getName()).log(Level.SEVERE, null, ex);
+            } finally {
+                try {
+                    fileOut.close();
+                } catch (IOException ex) {
+                    Logger.getLogger(SearchFrame.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
+    }
     
     /**
      * Method to export the data in the table as html file
@@ -479,9 +531,58 @@ public class SearchFrame extends javax.swing.JFrame {
             }
         }
     }//GEN-LAST:event_loadSQLButtonActionPerformed
+    
+    /**
+     * Method to export the results as an excel file
+     * 
+     * @param evt 
+     */
+    private void excelExportButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_excelExportButtonActionPerformed
+        Workbook wb = new HSSFWorkbook();
+        Sheet sheet = wb.createSheet("Search Results");
+        
+        // get the column names and add the data to sheet
+        CellStyle style = wb.createCellStyle();
+        Font font = wb.createFont();
+        font.setFontName(HSSFFont.FONT_ARIAL);
+        font.setFontHeightInPoints((short)10);
+        font.setBoldweight(Font.BOLDWEIGHT_BOLD);
+        style.setFont(font);
+        Row row = sheet.createRow(0);
+        
+        String[] columnNames = getColumnNames();
+        int numberOfColumns = columnNames.length;
+        
+        for (int j = 0; j < numberOfColumns; j++) {
+            String value = columnNames[j];
+            Cell cell = row.createCell(j);
+            cell.setCellValue(value);
+            cell.setCellStyle(style);
+        }
+        
+        // get all the records and place them in buffer
+        Object[][] data = dBTable.getDataArray();
+        int numberOfRecords = data.length;
+        
+        for(int i = 0; i < numberOfRecords; i++) {
+            row = sheet.createRow(i+1);
+            for(int j = 0; j < numberOfColumns; j++) {
+                String value = "";
+                Object object = data[i][j];
+                if(object != null) {
+                    value = cleanUpValue(object.toString());
+                }
+                row.createCell(j).setCellValue(value);
+            }
+        }
+        
+        // save the workbook now
+        saveExcelWorkbookToFile(wb);
+    }//GEN-LAST:event_excelExportButtonActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton closeButton;
+    private javax.swing.JButton excelExportButton;
     private javax.swing.JButton htmlExportButton;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;

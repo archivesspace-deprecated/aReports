@@ -71,7 +71,9 @@
                       <Component id="tsvExportButton" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="htmlExportButton" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="342" max="32767" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="excelExportButton" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace pref="225" max="32767" attributes="0"/>
                       <Component id="loadSQLButton" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="closeButton" min="-2" max="-2" attributes="0"/>
@@ -89,6 +91,7 @@
                               <Component id="searchButton" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="tsvExportButton" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="htmlExportButton" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="excelExportButton" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <Group type="103" groupAlignment="3" attributes="0">
                               <Component id="closeButton" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -146,6 +149,14 @@
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="loadSQLButtonActionPerformed"/>
+              </Events>
+            </Component>
+            <Component class="javax.swing.JButton" name="excelExportButton">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="XLS Export"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="excelExportButtonActionPerformed"/>
               </Events>
             </Component>
           </SubComponents>
