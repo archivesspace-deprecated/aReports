@@ -8,6 +8,7 @@ package areports;
 import areports.model.JasperReportInfo;
 import areports.model.RepositoryInfo;
 import areports.utils.ReportUtils;
+import areports.utils.StopWatch;
 import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -15,6 +16,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.logging.Level;
@@ -24,10 +26,12 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.view.JasperViewer;
+import org.apache.commons.lang.exception.ExceptionUtils;
 
 /**
  *
@@ -56,6 +60,9 @@ public class AReportsFrame extends javax.swing.JFrame {
     
     // this stores all the sql for the reports and sub reports
     private TreeMap<String, String> sqlTreeMap = new TreeMap<String, String>();
+    
+    // variable to keep track of if we runing a test on reports
+    private boolean runTest = false;
     
     /**
      * Creates new form AReportsFrame
@@ -200,9 +207,10 @@ public class AReportsFrame extends javax.swing.JFrame {
         statusTextField = new javax.swing.JTextField();
         jLabel12 = new javax.swing.JLabel();
         searchButton = new javax.swing.JButton();
+        testReportsButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("aReports -- A Desktop Archivesspace Reports Engine (v0.4.0 09/22/2015)");
+        setTitle("aReports -- A Desktop Archivesspace Reports Engine (v0.5.0 10/07/2015)");
 
         closeButton.setText("Close");
         closeButton.addActionListener(new java.awt.event.ActionListener() {
@@ -464,6 +472,14 @@ public class AReportsFrame extends javax.swing.JFrame {
             }
         });
 
+        testReportsButton.setText("Test Reports");
+        testReportsButton.setEnabled(false);
+        testReportsButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                testReportsButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -477,6 +493,8 @@ public class AReportsFrame extends javax.swing.JFrame {
                 .addComponent(disconnectButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(searchButton)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(testReportsButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(pushButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -506,7 +524,8 @@ public class AReportsFrame extends javax.swing.JFrame {
                     .addComponent(connectButton)
                     .addComponent(disconnectButton)
                     .addComponent(pushButton)
-                    .addComponent(searchButton)))
+                    .addComponent(searchButton)
+                    .addComponent(testReportsButton)))
         );
 
         pack();
@@ -573,11 +592,7 @@ public class AReportsFrame extends javax.swing.JFrame {
                     JasperViewer jasperViewer = new JasperViewer(jasperPrint, false);
                     jasperViewer.setVisible(true);
                 } catch (JRException ex) {
-                    JOptionPane.showMessageDialog(null,
-                            ex.getMessage(),
-                            "Jasper Report Error",
-                            JOptionPane.ERROR_MESSAGE);
-
+                    displayLogDialog("Jasper Report Error", currentReportInfo.toString(), ExceptionUtils.getStackTrace(ex));
                     Logger.getLogger(AReportsFrame.class.getName()).log(Level.SEVERE, null, ex);
                 }
 
@@ -644,6 +659,8 @@ public class AReportsFrame extends javax.swing.JFrame {
             previewButton.setEnabled(true);
             disconnectButton.setEnabled(true);
             searchButton.setEnabled(true);
+            testReportsButton.setEnabled(true);
+            
             statusTextField.setText("Connected to Databae ...");
             
             // now load the repositories
@@ -691,6 +708,9 @@ public class AReportsFrame extends javax.swing.JFrame {
                 connection = null;
                 previewButton.setEnabled(false);
                 disconnectButton.setEnabled(false);
+                searchButton.setEnabled(false);
+                testReportsButton.setEnabled(false);
+                
                 statusTextField.setText("Disconnected ...");
             } catch (SQLException ex) {
                 Logger.getLogger(AReportsFrame.class.getName()).log(Level.SEVERE, null, ex);
@@ -751,7 +771,151 @@ public class AReportsFrame extends javax.swing.JFrame {
             searchFrame.setVisible(true);
         }
     }//GEN-LAST:event_searchButtonActionPerformed
+    
+    /**
+     * Method to test the filling of reports with data and return and display and 
+     * collect an error with the test failed
+     * @param evt 
+     */
+    private void testReportsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_testReportsButtonActionPerformed
+        if (connection == null) {
+            return;
+        }
+        
+        // check to see if we are already running the reports so we can stop the process
+        if(runTest) {
+            runTest = false;
+            testReportsButton.setEnabled(false);
+            return;
+        }
+        
+        // create thread to actual process the report
+        previewButton.setEnabled(false);
+        testReportsButton.setText("Stop Report Test");
 
+        // start the progress bar going
+        progressBar.setIndeterminate(false);
+        progressBar.setMinimum(0);
+        progressBar.setMaximum(reportsMap.size());
+        progressBar.setStringPainted(true);
+        progressBar.setString("Testing Reports ...");
+        progressBar.setValue(0);
+        
+        // set the runtest variable to true
+        runTest = true;
+        
+        Thread testThread = new Thread("Report Test Thread") {
+
+            @Override
+            public void run() {
+                // these store the test log messages
+                StringBuilder sb = new StringBuilder();
+                
+                StopWatch stopWatch = new StopWatch();
+                
+                StopWatch stopWatchTotal = new StopWatch();
+                stopWatchTotal.start();
+                
+                reportDescriptionTextArea.setText("Running Report Test ...\n\n");
+                
+                String message;
+                String executionTime; 
+                int count = 1;
+                int increment = 1;
+                
+                for(String key: reportsMap.keySet()) {
+                    // test to make sure the cancle button wast processed
+                    if(!runTest) break;
+                    
+                    // update the progress bar here
+                    progressBar.setValue(increment++);
+                    
+                    Set<JasperReportInfo> reportInfoSet = reportsMap.get(key);
+                    for (JasperReportInfo reportInfo : reportInfoSet) {
+                        stopWatch.start();
+                       
+                        message = "[" + count++ + "] Testing: " + reportInfo + " >> ";
+                        sb.append(message);
+                        
+                        reportDescriptionTextArea.append(message);
+                        
+                        try {
+                            HashMap<String, Object> parameterMap = new HashMap<String, Object>();
+                            parameterMap.put("basePath", reportInfo.getParentDirectoryName());
+
+                            RepositoryInfo repositoryInfo = (RepositoryInfo) repositoryComboBox.getSelectedItem();
+                            Integer repositoryId = repositoryInfo.getRepositoryId();
+                            
+                            // for repositry profile reports we need to set an actual repository to test
+                            if(reportInfo.toString().equals("RepositoryProfileReport") && repositoryId == -1) {
+                                repositoryId = 2;
+                            }
+                            
+                            parameterMap.put("repositoryId", repositoryId);
+
+                            jasperReport = JasperCompileManager.compileReport(reportInfo.getFileName());
+                            jasperPrint = JasperFillManager.fillReport(jasperReport, parameterMap, connection);
+
+                            int pages = jasperPrint.getPages().size();
+                            
+                            stopWatch.stop();
+                            executionTime = stopWatch.getPrettyTime() + " / " + stopWatchTotal.getPrettyTime(); 
+                            
+                            message = "PASS / Pages: " + pages + " (" + executionTime + ")\n";
+                            sb.append(message);
+                            
+                            reportDescriptionTextArea.append(message);
+                        } catch (Exception ex) {
+                            String exceptionText = ExceptionUtils.getStackTrace(ex) + "\n";
+                            
+                            stopWatch.stop();
+                            executionTime = stopWatch.getPrettyTime() + " / " + stopWatchTotal.getPrettyTime();
+                            
+                            message = "FAIL: " + ex.getMessage() + " (" + executionTime + ")\n\n";
+                            sb.append(message).append(exceptionText);
+                            
+                            reportDescriptionTextArea.append(message);
+                        }
+                    }
+                }
+                
+                stopWatchTotal.stop();
+                
+                message = "\nReport Test Completed ... (" + stopWatchTotal.getPrettyTime() + ")\n";
+                sb.append(message);
+                
+                reportDescriptionTextArea.append(message);
+
+                // stop the progress bar and make the preview button active again
+                progressBar.setValue(0);
+                progressBar.setStringPainted(false);
+                previewButton.setEnabled(true);
+                testReportsButton.setEnabled(true);
+                testReportsButton.setText("Test Report");
+                
+                runTest = false;
+                
+                // display the log dialog with the error message
+                displayLogDialog("Report Test Log", "Report Test @ " + jdbcURLTextField.getText(), sb.toString());
+            }
+        };
+
+        testThread.start();
+    }//GEN-LAST:event_testReportsButtonActionPerformed
+    
+    /**
+     * Method to display the log or error message
+     * 
+     * @param title
+     * @param logTile
+     * @param message 
+     */
+    private void displayLogDialog(String title, String logTile, String message) {
+        LogDialog logDialog = new LogDialog(title, logTile, message);
+        logDialog.pack();
+        logDialog.setVisible(true);
+    }
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField aspaceDirectoryTextField;
     private javax.swing.JButton browseButton;
@@ -792,5 +956,6 @@ public class AReportsFrame extends javax.swing.JFrame {
     private javax.swing.JTextField sftpUsernameTextField;
     private javax.swing.JLabel statusLabel;
     private javax.swing.JTextField statusTextField;
+    private javax.swing.JButton testReportsButton;
     // End of variables declaration//GEN-END:variables
 }

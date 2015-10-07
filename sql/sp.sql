@@ -350,6 +350,33 @@ END $$
 
 DELIMITER ;
 
+-- Function to return the processing started date for a particular accession
+DROP FUNCTION IF EXISTS GetAccessionProcessingStartedDate;
+
+DELIMITER $$
+
+CREATE FUNCTION GetAccessionProcessingStartedDate(f_accession_id INT) 
+	RETURNS VARCHAR(255)
+	READS SQL DATA
+BEGIN
+	DECLARE f_value VARCHAR(255);	
+	
+	SELECT GetEventDateExpression(T1.event_id) INTO f_value  
+	FROM 
+            event_link_rlshp T1 
+	INNER JOIN 
+            event T2 ON T1.event_id = T2.id 
+	WHERE 
+            (T1.accession_id = f_accession_id  
+	AND 
+            BINARY GetEnumValue(T2.event_type_id) = BINARY 'processing_started')
+        LIMIT 1;
+	    
+	RETURN f_value;
+END $$
+
+DELIMITER ;
+
 -- Function to return the number of accessions that are cataloged for
 -- a particular repository
 DROP FUNCTION IF EXISTS GetAccessionsCataloged;
@@ -564,7 +591,7 @@ END $$
 
 DELIMITER ;
 
--- Function to return the date expression for an accession record
+-- Function to return the date expression for an event
 DROP FUNCTION IF EXISTS GetEventDateExpression;
 
 DELIMITER $$

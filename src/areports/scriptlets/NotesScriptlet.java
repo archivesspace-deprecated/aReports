@@ -93,7 +93,7 @@ public class NotesScriptlet extends JRDefaultScriptlet {
      * @param noteJS
      * @return
      */
-    private String getNoteContent(JSONObject noteJS) {
+    private String getNoteContent(JSONObject noteJS, String spacer) {
         JSONArray contentJA = noteJS.getJSONArray("content");
         String content = "";
 
@@ -101,9 +101,19 @@ public class NotesScriptlet extends JRDefaultScriptlet {
             content += " " + contentJA.getString(j);
         }
 
-        return content.trim();
+        return content.trim() + spacer;
     }
-
+    
+    /**
+     * Return the note content
+     * 
+     * @param noteJS
+     * @return 
+     */
+    private String getNoteContent(JSONObject noteJS) {
+        return getNoteContent(noteJS, "");
+    }
+    
     /**
      * Process
      *
@@ -136,15 +146,14 @@ public class NotesScriptlet extends JRDefaultScriptlet {
                     content += subnoteJS.getString("content") + "\n";
                 } else if (subnoteModelType.equals("note_chronology")) {
                     String events = concatEvents(subnoteJS.getJSONArray("items"));
-                    content += subnoteJS.getString("title") + " -- " + events + "\n";
+                    content += getSubnoteTile(subnoteJS) + events + "\n";
                 } else if (subnoteModelType.equals("note_definedlist")) {
                     String list = concatDefinedList(subnoteJS.getJSONArray("items"));
-                    content += subnoteJS.getString("title") + " -- " + list + "\n";
+                    content += getSubnoteTile(subnoteJS) + list + "\n";
                 } else if (subnoteModelType.equals("note_orderedlist")) {
                     String list = concatOrderedList(subnoteJS.getJSONArray("items"));
-                    content += subnoteJS.getString("title") + " -- " + list + "\n";
+                    content += getSubnoteTile(subnoteJS) + list + "\n";
                 } else {
-                    //content += getNoteContent(subnoteJS) + "\n";
                     content += subnoteModelType + "\n";
                 }
             }
@@ -153,19 +162,32 @@ public class NotesScriptlet extends JRDefaultScriptlet {
         } else if (modelType.equals("note_index")) {
             setVariableValue("type", "Index Item");
             String items = concatIndexItems(noteJS.getJSONArray("items"));
-            content += noteJS.getJSONArray("content").getString(0) + " -- " + items + "\n";
+            content += getNoteContent(noteJS, " -- ") + items + "\n";
             setVariableValue("content", content);
         } else if (modelType.equals("note_bibliography")) {
             setVariableValue("type", "Bibliography");
             String items = concatOrderedList(noteJS.getJSONArray("items"));
-            content += noteJS.getJSONArray("content").getString(0) + " -- " + items + "\n";
+            content += getNoteContent(noteJS, " -- ") + items + "\n";
             setVariableValue("content", content);
         } else {
             setVariableValue("type", "NOT PROCESSED");
             setVariableValue("content", "CONTENT NOT PROCESSED ...");
         }
     }
-
+    
+    /**
+     * Method to return the title of a subnote if it has it
+     * @param subnoteJS
+     * @return 
+     */
+    private String getSubnoteTile(JSONObject subnoteJS) {
+        if(subnoteJS.has("title")) {
+            return subnoteJS.getString("title") + " -- ";
+        } else {
+            return "";
+        }
+    }
+    
     /**
      * Method to concat all events into a string
      *
@@ -181,8 +203,12 @@ public class NotesScriptlet extends JRDefaultScriptlet {
             String event = eventJS.getJSONArray("events").getString(0);
             combinedEvents += event + ": " + eventDate + ", ";
         }
-
-        return combinedEvents.substring(0, (combinedEvents.length() - 2));
+        
+        if(combinedEvents.length() > 3) {
+            return combinedEvents.substring(0, (combinedEvents.length() - 2));
+        } else {
+            return "";
+        }
     }
 
     /**
@@ -199,8 +225,12 @@ public class NotesScriptlet extends JRDefaultScriptlet {
             String value = itemJS.getString("value");
             combinedList += label + ": " + value + ", ";
         }
-
-        return combinedList.substring(0, (combinedList.length() - 2));
+        
+        if(combinedList.length() > 3) {
+            return combinedList.substring(0, (combinedList.length() - 2));
+        } else {
+            return "";
+        }
     }
     
     /**
@@ -215,8 +245,12 @@ public class NotesScriptlet extends JRDefaultScriptlet {
             String value = itemsJA.getString(i);
             combinedList += value + ", ";
         }
-
-        return combinedList.substring(0, (combinedList.length() - 2));
+        
+        if(combinedList.length() > 3) {
+            return combinedList.substring(0, (combinedList.length() - 2));
+        } else {
+            return "";
+        }
     }
 
     /**
